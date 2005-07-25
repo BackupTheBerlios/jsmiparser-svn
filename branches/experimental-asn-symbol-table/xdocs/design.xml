@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<!--
+    Copyright 2005 Davy Verstappen.
+    
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+    
+        http://www.apache.org/licenses/LICENSE-2.0
+    
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<document>
+    <properties>
+	<author email="davy.AT.jsmiparser.DOT.org">Davy Verstappen</author>
+	<title>Java SMI Parser Design</title>
+    </properties>
+    <meta name="keyword" content="java,smi,snmp,parser,design"/>
+    
+    <body>
+	<section name="Package Diagram">
+
+	    <img src="jsmiparser.png"/>
+
+	</section>
+
+	<section name="Phases">
+	    
+	    <ul>
+		<li>
+		    A pluggable parser generates a parse tree for each
+		    file. This can cause syntax errors, and also file
+		    resolution errors (e.g. when a module imports
+		    another one that cannot be found).
+		</li>
+		<li>
+		    OID's must be resolved. Again this can cause name
+		    resolution errors.
+		</li>
+		<li>
+		    The parse tree is converted into a symbol table.
+		</li>
+		<li>
+		    High level semantic error handling is done at this
+		    point (e.g. INDEX clauses must use INTEGER with a
+		    range, not Integer32).
+		</li>
+		<li>
+		    An optional pluggable conception model builder
+		    adds the class/attribute/relationship information
+		    to the symbol table.
+		</li>
+	    </ul>
+	
+	</section>
+		
+
+	<section name="Features">
+
+	    <ul>
+		<li>
+		    The location of a symbol (file, line, column)
+		    stays available throughout all the parsing phases,
+		    and in the resulting symbol table.
+		</li>
+		<li>
+		    Configurable error/warning reporting.
+		</li>
+		<li>
+		    Comparing whether two mibs are equal or not, with
+		    appropriate reporting.
+		</li>
+		<li>
+		    Pretty printing of a mib file, either as SMIv1 or
+		    SMIv2. This can also be used as a unit test: parse
+		    a mib, print it, parse the printed version and
+		    compare the two parsed mibs: they should be
+		    identical (apart from file/line numbers).
+		</li>
+		<li>
+		    Merging of multiple mibs versions, with error
+		    reporting when there are incompatibilities. From
+		    an implementation point of view, there is a bit of
+		    overlap with comparing for equality, so
+		    duplication should be avoided.
+		</li>
+		<li>
+		    Building of a conceptual model. For more
+		    information, see <a
+		    href="http://www.ibr.cs.tu-bs.de/vs/papers/im-2001.pdf">
+		    Reverse Engineering Internet MIBs</a>. The
+		    algorithm for building the model should be
+		    pluggable.
+		</li>
+		<li>
+		    Saving to and restoring from XML.
+		</li>
+	    </ul>
+
+	</section>
+
+	<section name="Error Handling">
+	    
+	    <p>
+		TODO.
+	    </p>
+	    <ul>
+		<li>
+		    Ensure that we use the necessary error handling
+		    mechanism from antlr.
+		</li>
+		<li>
+		    Explain the ProblemReporterFactory and
+		    ProblemEventHandler mechanism.
+		</li>
+	    </ul>
+
+	</section>
+
+    </body>
+</document>
