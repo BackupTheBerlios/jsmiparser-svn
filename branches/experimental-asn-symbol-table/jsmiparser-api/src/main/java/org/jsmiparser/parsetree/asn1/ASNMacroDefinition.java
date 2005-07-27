@@ -34,8 +34,12 @@ public class ASNMacroDefinition extends ASNAssignment {
     	
         setType (Type.MACRODEF);
     }
-    
-	public List<String> getTokens() {
-		return tokens_;
-	}
+
+    public Symbol getRightHandSide() {
+        return this;
+    }
+
+    public List<String> getTokens() {
+        return tokens_;
+    }
 }

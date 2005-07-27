@@ -22,7 +22,7 @@ import org.jsmiparser.util.token.IdToken;
  *
  * @author  Nigel Sheridan-Smith
  */
-public class ASNAssignment extends AbstractNamedSymbol {
+public abstract class ASNAssignment extends AbstractNamedSymbol {
 
     enum Type
     {
@@ -52,4 +52,9 @@ public class ASNAssignment extends AbstractNamedSymbol {
         return type;
     }
 
+    public abstract Symbol getRightHandSide();
+
+    public void setIdToken(IdToken token) {
+        doSetIdToken(token);
+    }
 }

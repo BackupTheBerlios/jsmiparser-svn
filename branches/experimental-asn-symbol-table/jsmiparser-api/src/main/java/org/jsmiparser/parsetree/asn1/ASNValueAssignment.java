@@ -34,6 +34,10 @@ public class ASNValueAssignment extends ASNAssignment {
         setType (Type.VALUE);
     }
 
+    public Symbol getRightHandSide() {
+        return value;
+    }
+
     public void setEntityType (ASNType t)
     {
         entityType = t;
@@ -53,5 +57,6 @@ public class ASNValueAssignment extends ASNAssignment {
     {
         return value;
     }
+
 
 }

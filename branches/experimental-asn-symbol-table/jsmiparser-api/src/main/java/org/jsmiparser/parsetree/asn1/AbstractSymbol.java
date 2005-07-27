@@ -26,12 +26,15 @@ public abstract class AbstractSymbol implements Symbol {
     private ASNModule m_module;
     private Location m_location;
 
+    // TODO remove
     protected AbstractSymbol(Context context) {
         super();
 
         m_module = context.getModule();
         m_location = context.getLocationFactory().create();
     }
+
+    
 
     public Location getLocation() {
         return m_location;

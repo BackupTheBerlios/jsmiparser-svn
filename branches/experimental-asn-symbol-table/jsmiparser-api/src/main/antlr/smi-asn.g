@@ -329,14 +329,12 @@ assignment  returns [ASNAssignment a = null]
 {
 	ASNType t1=null,t2=null;
 	ASNValue v=null;
-	ASNTypeAssignment ta = null;
 	ASNValueAssignment va = null;
 	ASNMacroDefinition ma = null;
 	Token m=null;
 }
 :
-	u1:UPPER ASSIGN_OP { ta = new ASNTypeAssignment(context_, idt(u1)); a = ta; }
-	t1=type            { ta.setEntityType(t1); }
+	u1:UPPER ASSIGN_OP t1=type { a = makeTypeAssignment(u1, t1); }
 |
  	l:LOWER { va = new ASNValueAssignment(context_, idt(l)); a = va; }
 	t2=type { va.setEntityType(t2); }

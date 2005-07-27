@@ -29,14 +29,14 @@ import java.util.ArrayList;
  * @author  Nigel Sheridan-Smith
  */
 public class ASNModule extends AbstractNamedSymbol {
-    
-	public enum Type
-	{
-		ASN1,
-		SMIv1,
-		SMIv2,
-		SPPI
-	}
+
+    public enum Type
+    {
+        ASN1,
+        SMIv1,
+        SMIv2,
+        SPPI
+    }
 	
     private Type type;
     private boolean explicitTags;
@@ -46,7 +46,9 @@ public class ASNModule extends AbstractNamedSymbol {
     private ASNOidComponentList definitiveIdentifier;
     private ASNExports exports;
     private List<ASNImports> imports = new ArrayList<ASNImports>();
-    private List<ASNAssignment> assignments = new ArrayList<ASNAssignment>();
+    private List<ASNAssignment> assignments = new ArrayList<ASNAssignment>(); // TODO
+
+    private ASNSymbolMap<ASNTypeAssignment> m_typeMap;
     
     
     /** Creates a new instance of ASNModule */
@@ -54,6 +56,8 @@ public class ASNModule extends AbstractNamedSymbol {
     {
     	super(context, idToken);
         type = Type.ASN1;
+
+        m_typeMap = new ASNSymbolMap<ASNTypeAssignment>(this, context, ASNTypeAssignment.class);
     }
     
     public void setType (Type t)
@@ -162,8 +166,16 @@ public class ASNModule extends AbstractNamedSymbol {
     	}
     	return null;
     }
-	
-	public void print(PrintWriter out)
+
+    public ASNSymbolMap<ASNTypeAssignment> getTypeMap() {
+        return m_typeMap;
+    }
+
+    public ASNTypeAssignment findTypeAssignment(String id) {
+        return m_typeMap.find(id);
+    }
+
+    public void print(PrintWriter out)
 	{
 		out.println(getModuleName());
 		if (type.equals(Type.SPPI))

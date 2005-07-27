@@ -35,4 +35,9 @@ public abstract class AbstractNamedSymbol extends AbstractSymbol implements Name
     public IdToken getIdToken() {
         return m_idToken;
     }
+
+    protected void doSetIdToken(IdToken idToken) {
+        // TODO put some check here?
+        m_idToken = idToken;
+    }
 }

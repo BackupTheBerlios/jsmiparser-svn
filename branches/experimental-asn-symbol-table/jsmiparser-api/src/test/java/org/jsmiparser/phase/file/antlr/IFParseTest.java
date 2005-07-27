@@ -20,8 +20,11 @@ import antlr.TokenStreamException;
 import junit.framework.TestCase;
 import org.jsmiparser.parsetree.asn1.ASNAssignment;
 import org.jsmiparser.parsetree.asn1.ASNModule;
+import org.jsmiparser.parsetree.asn1.ASNTypeAssignment;
+import org.jsmiparser.parsetree.asn1.ASNType;
 
 import java.io.InputStream;
+import java.io.BufferedInputStream;
 
 /**
  * @author davy
@@ -29,38 +32,46 @@ import java.io.InputStream;
  */
 public class IFParseTest extends TestCase {
 
-	/**
-	 * 
-	 */
-	public IFParseTest() {
-		super();
-	}
+    /**
+     *
+     */
+    public IFParseTest() {
+        super();
+    }
 
-	public void testModule_definition() throws RecognitionException, TokenStreamException {
-		
-		InputStream is = this.getClass().getResourceAsStream("/IF-MIB");
-		
-		SMILexer lexer = new SMILexer(is);
-		SMIParser parser = new SMIParser(lexer);
+    public void testModule_definition() throws RecognitionException, TokenStreamException {
+
+        InputStream is = new BufferedInputStream(this.getClass().getResourceAsStream("/IF-MIB"));
+
+        SMILexer lexer = new SMILexer(is);
+        SMIParser parser = new SMIParser(lexer);
         parser.setSource("/IF-MIB");
 
         ASNModule module = parser.module_definition();
-		
-		assertEquals("IF-MIB", module.getModuleName());
-		assertEquals("IF-MIB", module.getName());
-		assertEquals(1, module.getLocation().getLine());
-		
+
+        assertEquals("IF-MIB", module.getModuleName());
+        assertEquals("IF-MIB", module.getName());
+        assertEquals(1, module.getLocation().getLine());
+
 //		for (ASNAssignment a : module.getAssignments())
 //		{
 //			System.out.println(a.getLine() + ": " + a.getName());
 //		}
-		
-		ASNAssignment a = module.findAssignment("ifCompliance");
-		assertNotNull(a);
-		assertEquals(1741, a.getLocation().getLine());
-		
+
+        ASNAssignment a = module.findAssignment("ifCompliance");
+        assertNotNull(a);
+        assertEquals(1741, a.getLocation().getLine());
+
+        assertEquals(8, module.getTypeMap().size());
+
+        ASNTypeAssignment ta = module.findTypeAssignment("InterfaceIndexOrZero");
+        assertNotNull(ta);
+        ASNType entityType = ta.getEntityType();
+        assertNotNull(entityType);
+        assertEquals(ASNType.Enum.SMITEXTUALCONVENTIONMACRO, entityType.getType());
+
 //		PrintWriter out = new PrintWriter(System.out);
 //		module.print(out);
 //		assertFalse(out.checkError());
-	}
+    }
 }

@@ -179,4 +179,10 @@ public abstract class SMIAbstractParser extends LLkParser implements Context {
     public ASNModule getModule() {
         return m_module;
     }
+
+    public ASNTypeAssignment makeTypeAssignment(Token idToken, ASNType type) {
+        ASNTypeAssignment result = m_module.getTypeMap().create(idt(idToken));
+        result.setEntityType(type);
+        return result;
+    }
 }

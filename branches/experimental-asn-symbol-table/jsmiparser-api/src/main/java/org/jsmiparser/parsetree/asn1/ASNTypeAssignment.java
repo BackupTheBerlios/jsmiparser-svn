@@ -33,6 +33,10 @@ public class ASNTypeAssignment extends ASNAssignment {
         setType (Type.TYPE);
     }
 
+    public Symbol getRightHandSide() {
+        return entityType;
+    }
+
     public void setEntityType (ASNType t)
     {
         entityType = t;

@@ -67,7 +67,16 @@ public class SmiDefaultParserTest extends TestCase {
         String mibsVar = System.getenv("MIBS");
         assertNotNull(mibsVar);
         String[] mibDirs = mibsVar.split(":");
-        assertEquals(4, mibDirs.length);
+        parseDirs(mibDirs, options);
+
+        mibsVar = System.getenv("ASN1_MIBS");
+        if (mibsVar != null) {
+            mibDirs = mibsVar.split(":");
+            // TODO parseDirs(mibDirs, options);
+        }
+    }
+
+    private void parseDirs(String[] mibDirs, FileParserOptions options) {
         for (String d : mibDirs) {
             File dir = new File(d);
             assertTrue(dir.toString(), dir.exists());
