@@ -67,8 +67,7 @@ public class ASNImports extends AbstractNamedSymbol {
         return assignedIdentifierDefined;
     }
 
-    public void addAssigment(IdToken idToken) {
-        ASNAssignment assignment = m_importedModule.use(idToken);
+    public void addAssigment(IdToken idToken, ASNAssignment assignment) {
         m_assigmentMap.put(assignment, idToken);
     }
 }

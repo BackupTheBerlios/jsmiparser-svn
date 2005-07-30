@@ -98,44 +98,33 @@ public class FileParserPhase implements Phase {
         m_context = context;
     }
 
-    public ASNModule use(IdToken idToken) {
-        ASNModule result = m_createdModuleMap.get(idToken.getId());
-        if (result != null) {
-            return result;
-        }
-
+    public FileParser use(IdToken idToken) {
+        FileParser fileParser;
         File file = m_options.findFile(idToken.getId());
         if (file != null) {
-            FileParser fileParser = m_fileParserMap.get(file);
+             fileParser = m_fileParserMap.get(file);
             if (fileParser == null) {
                 fileParser = createFileParser(file);
+            }
+            if (fileParser.getState() == FileParser.State.PARSING) {
+                System.err.println("Warning: using " + idToken.getId() + " from " + idToken.getLocation() + " while " + file + " is being parsed. Import cycle?");
             }
             if (fileParser.getState() == FileParser.State.UNPARSED) {
                 fileParser.parse();
             }
-            result = fileParser.getModule();
         } else {
             m_pr.reportCannotFindModuleFile(idToken);
-            result = new ASNModule(m_mib, idToken);
+            fileParser = createFileParser(file);
         }
-        assert(result != null);
-        return result;
-    }
-
-    public ASNModule create(IdToken idToken) {
-        ASNModule result = m_createdModuleMap.get(idToken.getId());
-        if (result != null) {
-            ASNModule dup = new ASNModule(m_mib, idToken);
-            m_pr.reportDuplicateModule(dup, result);
-            result = dup;
-        } else {
-            result = new ASNModule(m_mib, idToken);
-            m_createdModuleMap.put(idToken.getId(), result);
-        }
-        return result;
+        fileParser.useModule(idToken);
+        return fileParser;
     }
 
     public FileParserOptions getOptions() {
         return m_options;
+    }
+
+    public ASNMib getMib() {
+        return m_mib;
     }
 }

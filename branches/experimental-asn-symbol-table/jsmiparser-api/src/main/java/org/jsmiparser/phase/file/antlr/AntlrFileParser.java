@@ -37,7 +37,7 @@ public class AntlrFileParser extends AbstractFileParser {
             InputStream is = new BufferedInputStream(new FileInputStream(m_file));
             SMILexer lexer = new SMILexer(is);
             SMIParser parser = new SMIParser(lexer);
-            parser.init(m_file.getPath(), m_fileParserPhase);
+            parser.init(m_file.getPath(), this);
             
             m_module = parser.module_definition();
             is.close();
@@ -55,4 +55,7 @@ public class AntlrFileParser extends AbstractFileParser {
             m_state = State.PARSED;
         }
     }
+
+
+
 }

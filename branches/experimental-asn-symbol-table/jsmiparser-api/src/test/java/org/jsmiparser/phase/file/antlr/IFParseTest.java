@@ -50,7 +50,8 @@ public class IFParseTest extends TestCase {
         SMIParser parser = new SMIParser(lexer);
         FileParserPhase fileParserPhase = new FileParserPhase(new DefaultProblemReporterFactory(new DefaultProblemEventHandler()),
                 AntlrFileParser.class);
-        parser.init("/IF-MIB", fileParserPhase);
+        AntlrFileParser fileParser = new AntlrFileParser(fileParserPhase, null);
+        parser.init("/IF-MIB", fileParser);
 
         ASNModule module = parser.module_definition();
 
@@ -68,12 +69,11 @@ public class IFParseTest extends TestCase {
         assertEquals(1741, a.getLocation().getLine());
 
         if (m_log.isDebugEnabled()) {
-            for (ASNTypeAssignment ta : module.getTypeMap().getAll()) {
+            for (ASNAssignment ta : module.getAssignments()) {
                 m_log.debug(ta.getModule().getIdToken() + " " + ta.getIdToken());
             }
         }
-        m_log.debug(module.getTypeMap());
-        assertEquals(8, module.getTypeMap().size());
+        assertEquals(99, module.getAssignments().size());
 
         ASNTypeAssignment ta = module.findTypeAssignment("InterfaceIndexOrZero");
         assertNotNull(ta);

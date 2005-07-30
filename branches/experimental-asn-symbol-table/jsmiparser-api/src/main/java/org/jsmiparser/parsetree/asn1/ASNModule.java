@@ -47,10 +47,6 @@ public class ASNModule extends AbstractNamedSymbol {
     private List<ASNImports> imports = new ArrayList<ASNImports>();
     private List<ASNAssignment> assignments = new ArrayList<ASNAssignment>(); // TODO
 
-    private ASNSymbolMap<ASNTypeAssignment> m_typeMap;
-    private ASNSymbolMap<ASNValueAssignment> m_valueMap;
-    private ASNSymbolMap<ASNMacroDefinition> m_macroMap;
-
 
     /**
      * Creates a new instance of ASNModule
@@ -64,11 +60,6 @@ public class ASNModule extends AbstractNamedSymbol {
         if (m_mib != null) { // for testing purposes
             m_mib.addModule(this);
         }
-
-        // TODO remove
-        m_typeMap = new ASNSymbolMap<ASNTypeAssignment>(this, ASNTypeAssignment.class);
-        m_valueMap = new ASNSymbolMap<ASNValueAssignment>(this, ASNValueAssignment.class);
-        m_macroMap = new ASNSymbolMap<ASNMacroDefinition>(this, ASNMacroDefinition.class);
     }
 
     public ASNMib getMib() {
@@ -160,60 +151,28 @@ public class ASNModule extends AbstractNamedSymbol {
         return null;
     }
 
-    public ASNSymbolMap<ASNTypeAssignment> getTypeMap() {
-        return m_typeMap;
-    }
-
     public ASNTypeAssignment findTypeAssignment(String id) {
-        return m_typeMap.find(id);
-    }
-
-    public ASNSymbolMap<ASNValueAssignment> getValueMap() {
-        return m_valueMap;
+        ASNAssignment a = findAssignment(id);
+        if (a instanceof ASNTypeAssignment) {
+            return (ASNTypeAssignment) a;
+        }
+        return null;
     }
 
     public ASNValueAssignment findValueAssignment(String id) {
-        return m_valueMap.find(id);
-    }
-
-    public ASNSymbolMap<ASNMacroDefinition> getMacroMap() {
-        return m_macroMap;
+        ASNAssignment a = findAssignment(id);
+        if (a instanceof ASNTypeAssignment) {
+            return (ASNValueAssignment) a;
+        }
+        return null;
     }
 
     public ASNMacroDefinition findMacroDefinition(String id) {
-        return m_macroMap.find(id);
-    }
-
-    public ASNAssignment create(IdToken idToken) {
-        ASNAssignment result = null;
-        switch (ASNAssignment.determineType(idToken)) {
-            case MACRODEF:
-                result = m_macroMap.create(idToken);
-                break;
-            case TYPE:
-                result = m_typeMap.create(idToken);
-                break;
-            case VALUE:
-                result = m_valueMap.create(idToken);
-                break;
+        ASNAssignment a = findAssignment(id);
+        if (a instanceof ASNTypeAssignment) {
+            return (ASNMacroDefinition) a;
         }
-        return result;
-    }
-
-    public ASNAssignment use(IdToken idToken) {
-        ASNAssignment result = null;
-        switch (ASNAssignment.determineType(idToken)) {
-            case MACRODEF:
-                result = m_macroMap.use(idToken);
-                break;
-            case TYPE:
-                result = m_typeMap.use(idToken);
-                break;
-            case VALUE:
-                result = m_valueMap.use(idToken);
-                break;
-        }
-        return result;
+        return null;
     }
 
 

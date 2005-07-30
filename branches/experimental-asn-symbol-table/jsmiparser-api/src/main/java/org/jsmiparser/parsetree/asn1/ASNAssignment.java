@@ -23,7 +23,7 @@ import org.jsmiparser.util.token.IdToken;
  */
 public abstract class ASNAssignment extends AbstractNamedSymbol {
 
-    enum Type {
+    public enum Type {
         UNKNOWN,
         TYPE,
         VALUE,

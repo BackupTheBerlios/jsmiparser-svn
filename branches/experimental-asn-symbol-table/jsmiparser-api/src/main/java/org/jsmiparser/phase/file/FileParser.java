@@ -15,13 +15,18 @@
  */
 package org.jsmiparser.phase.file;
 
-import org.jsmiparser.parsetree.asn1.ASNModule;
+import org.jsmiparser.parsetree.asn1.*;
+import org.jsmiparser.util.token.IdToken;
 
 import java.io.File;
 
 public interface FileParser {
 
-    enum State { UNPARSED, PARSING, PARSED }
+    enum State {
+        UNPARSED,
+        PARSING,
+        PARSED
+    }
 
     ASNModule parse();
 
@@ -30,4 +35,15 @@ public interface FileParser {
     State getState();
 
     ASNModule getModule();
+
+    ASNSymbolMap<ASNTypeAssignment> getTypeMap();
+
+    ASNSymbolMap<ASNValueAssignment> getValueMap();
+
+    ASNSymbolMap<ASNMacroDefinition> getMacroMap();
+
+    ASNAssignment use(IdToken idToken);
+
+    ASNModule useModule(IdToken idToken);
+
 }
