@@ -234,8 +234,20 @@ public abstract class SMIAbstractParser extends LLkParser implements Context {
         } else {
             result.setTypeAssignment(m_module.getTypeMap().resolve(idt(idToken)));
         }
-            result.setConstraint(c);
+        result.setConstraint(c);
 
+        return result;
+    }
+
+    protected ASNDefinedValue makeDefinedValue(Token moduleToken, Token idToken) {
+        ASNDefinedValue result = new ASNDefinedValue(context_);
+        if (moduleToken != null) {
+            ASNModule module = m_mibParser.use(idt(moduleToken));
+            ASNValueAssignment va = module.getValueMap().use(idt(idToken));
+            result.setValueAssignment(va);
+        } else {
+            result.setValueAssignment(m_module.getValueMap().resolve(idt(idToken)));
+        }
         return result;
     }
 }

@@ -290,10 +290,13 @@ obj_id_comp_lst returns [ASNOidComponentList o = new ASNOidComponentList(context
       (i=obj_id_component               {o.getOidComponents().add(i);}
       )+ R_BRACE;
 
-protected defined_value returns [ASNDefinedValue d = new ASNDefinedValue(context_)]
-    : (u:UPPER DOT                      {d.setExternalModule(u.getText());}
-      )? 
-      l:LOWER                           {d.setValueReference(l.getText());};
+protected defined_value returns [ASNDefinedValue d = null]
+:
+    (u:UPPER DOT)? l:LOWER
+    {
+        d = makeDefinedValue(u, l);
+    }
+;
 
 /* NSS 14/1/05: Checked against X.680 */
 obj_id_component returns [ASNOidComponent o = null]
