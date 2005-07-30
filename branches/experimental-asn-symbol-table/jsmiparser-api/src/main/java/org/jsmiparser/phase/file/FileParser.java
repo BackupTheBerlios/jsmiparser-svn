@@ -16,7 +16,6 @@
 package org.jsmiparser.phase.file;
 
 import org.jsmiparser.parsetree.asn1.ASNModule;
-import org.jsmiparser.phase.PhaseException;
 
 import java.io.File;
 
@@ -24,9 +23,11 @@ public interface FileParser {
 
     enum State { UNPARSED, PARSING, PARSED }
 
-    ASNModule parse() throws PhaseException;
+    ASNModule parse();
 
     File getFile();
-    
+
     State getState();
+
+    ASNModule getModule();
 }

@@ -15,6 +15,8 @@
  */
 package org.jsmiparser.phase.file;
 
+import org.jsmiparser.parsetree.asn1.ASNModule;
+
 import java.io.File;
 
 public abstract class AbstractFileParser implements FileParser {
@@ -22,6 +24,7 @@ public abstract class AbstractFileParser implements FileParser {
     protected FileParserPhase m_fileParserPhase;
     protected File m_file;
     protected State m_state = State.UNPARSED;
+    protected ASNModule m_module;
 
     protected AbstractFileParser(FileParserPhase fileParserPhase, File file) {
         m_fileParserPhase = fileParserPhase;
@@ -38,5 +41,9 @@ public abstract class AbstractFileParser implements FileParser {
 
     public State getState() {
         return m_state;
+    }
+
+    public ASNModule getModule() {
+        return m_module;
     }
 }

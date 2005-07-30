@@ -30,7 +30,7 @@ public class AntlrFileParser extends AbstractFileParser {
         super(fileParserPhase, file);
     }
 
-    public ASNModule parse() throws PhaseException {
+    public ASNModule parse() {
         assert(m_state == State.UNPARSED);
         try {
             m_state = State.PARSING;
@@ -39,10 +39,10 @@ public class AntlrFileParser extends AbstractFileParser {
             SMIParser parser = new SMIParser(lexer);
             parser.init(m_file.getPath(), m_fileParserPhase);
             
-            ASNModule module = parser.module_definition();
+            m_module = parser.module_definition();
             is.close();
-            
-            return module;
+
+            return m_module;
         } catch (FileNotFoundException e) {
             throw new PhaseException(e);
         } catch (RecognitionException e) {

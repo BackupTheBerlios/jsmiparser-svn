@@ -26,22 +26,23 @@ import org.jsmiparser.util.token.IdToken;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.HashMap;
 
 // TODO allow any URL's
 
 public class FileParserPhase implements Phase {
 
+    private FileParserProblemReporter m_pr;
     private Constructor<? extends FileParser> m_fileParserConstructor;
 
-    private Map<String, ASNModule> m_moduleMap = new HashMap<String, ASNModule>();
-    private Context m_context;
+    private Context m_context; // TODO delete
 
     private FileParserOptions m_options = new FileParserOptions();
     private Map<File, FileParser> m_fileParserMap = new LinkedHashMap<File, FileParser>();
-    private FileParserProblemReporter m_pr;
+    private Map<String, ASNModule> m_createdModuleMap = new HashMap<String, ASNModule>();
+
     private ASNMib m_mib;
 
     public FileParserPhase(ProblemReporterFactory prf, Class<? extends FileParser> fileParserClass) {
@@ -75,17 +76,17 @@ public class FileParserPhase implements Phase {
         }
     }
 
-    private FileParser createFileParser(File file) throws PhaseException {
+    private FileParser createFileParser(File file) {
         try {
             FileParser fileParser = m_fileParserConstructor.newInstance(this, file);
             m_fileParserMap.put(file, fileParser);
             return fileParser;
         } catch (InstantiationException e) {
-            throw new PhaseException(e);
+            throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
-            throw new PhaseException(e);
+            throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
-            throw new PhaseException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -98,42 +99,38 @@ public class FileParserPhase implements Phase {
     }
 
     public ASNModule use(IdToken idToken) {
-        try {
-            // TODO the datastructure is not yet ok
-            ASNModule result = m_moduleMap.get(idToken.getId());
-            if (result == null) {
-                File file = m_options.findFile(idToken.getId());
-                if (file != null) {
-                    FileParser fileParser = m_fileParserMap.get(file);
-                    if (fileParser == null) {
-                        fileParser = createFileParser(file);
-                    }
-                    if (fileParser.getState() == FileParser.State.UNPARSED) {
-                        result = fileParser.parse();
-                    } else {
-                        assert(false); // then there should be an entry in m_moduleMap
-                    }
-                } else {
-                    m_pr.reportCannotFindModuleFile(idToken);
-                    result = new ASNModule(m_mib, idToken);
-                    m_moduleMap.put(idToken.getId(), result);
-                }
-            }
+        ASNModule result = m_createdModuleMap.get(idToken.getId());
+        if (result != null) {
             return result;
-        } catch (PhaseException e) {
-            throw new RuntimeException(e);
         }
+
+        File file = m_options.findFile(idToken.getId());
+        if (file != null) {
+            FileParser fileParser = m_fileParserMap.get(file);
+            if (fileParser == null) {
+                fileParser = createFileParser(file);
+            }
+            if (fileParser.getState() == FileParser.State.UNPARSED) {
+                fileParser.parse();
+            }
+            result = fileParser.getModule();
+        } else {
+            m_pr.reportCannotFindModuleFile(idToken);
+            result = new ASNModule(m_mib, idToken);
+        }
+        assert(result != null);
+        return result;
     }
 
     public ASNModule create(IdToken idToken) {
-        ASNModule result = m_moduleMap.get(idToken.getId());
+        ASNModule result = m_createdModuleMap.get(idToken.getId());
         if (result != null) {
             ASNModule dup = new ASNModule(m_mib, idToken);
             m_pr.reportDuplicateModule(dup, result);
             result = dup;
         } else {
             result = new ASNModule(m_mib, idToken);
-            m_moduleMap.put(idToken.getId(), result);
+            m_createdModuleMap.put(idToken.getId(), result);
         }
         return result;
     }
