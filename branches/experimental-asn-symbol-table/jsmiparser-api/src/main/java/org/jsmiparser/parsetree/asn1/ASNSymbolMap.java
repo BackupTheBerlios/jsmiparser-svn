@@ -79,7 +79,6 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
     private Assignment findImport(IdToken idToken) {
         for (ASNImports imports : m_module.getImports()) {
             for (ASNAssignment assignment : imports.getSymbols()) {
-                //if (assignment != null) { // TODO remove this test when value and macro symbol tables are implemented
                 if (assignment.getName().equals(idToken.getId()) && m_assigmentClass.isInstance(assignment)) {
                     return m_assigmentClass.cast(assignment);
                 }
