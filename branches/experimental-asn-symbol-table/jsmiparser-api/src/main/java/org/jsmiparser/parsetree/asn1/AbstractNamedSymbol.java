@@ -17,9 +17,9 @@ package org.jsmiparser.parsetree.asn1;
 
 import org.jsmiparser.util.token.IdToken;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author davy
@@ -30,6 +30,11 @@ public abstract class AbstractNamedSymbol extends AbstractSymbol implements Name
 
     public AbstractNamedSymbol(Context context, IdToken idToken) {
         super(context);
+        m_idToken = idToken;
+    }
+
+    protected AbstractNamedSymbol(ASNModule module, IdToken idToken) {
+        super(module, idToken.getLocation());
         m_idToken = idToken;
     }
 

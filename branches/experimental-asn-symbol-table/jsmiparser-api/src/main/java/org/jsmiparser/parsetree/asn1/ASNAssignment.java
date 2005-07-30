@@ -36,8 +36,8 @@ public abstract class ASNAssignment extends AbstractNamedSymbol {
     /**
      * Creates a new instance of ASNAssignment
      */
-    public ASNAssignment(Context context, IdToken idToken) {
-        super(context, idToken);
+    public ASNAssignment(ASNModule module, IdToken idToken) {
+        super(module, idToken);
         setType(Type.UNKNOWN);
     }
 

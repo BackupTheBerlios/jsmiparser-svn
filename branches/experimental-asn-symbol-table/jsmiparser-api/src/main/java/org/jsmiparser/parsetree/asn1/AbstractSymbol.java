@@ -34,7 +34,10 @@ public abstract class AbstractSymbol implements Symbol {
         m_location = context.getLocationFactory().create();
     }
 
-    
+    protected AbstractSymbol(ASNModule module, Location location) {
+        m_module = module;
+        m_location = location;
+    }
 
     public Location getLocation() {
         return m_location;

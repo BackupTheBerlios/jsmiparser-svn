@@ -329,20 +329,16 @@ assignment  returns [ASNAssignment a = null]
 {
 	ASNType t1=null,t2=null;
 	ASNValue v=null;
-	ASNValueAssignment va = null;
 	ASNMacroDefinition ma = null;
 	Token m=null;
 }
 :
 	u1:UPPER ASSIGN_OP t1=type { a = makeTypeAssignment(u1, t1); }
 |
- 	l:LOWER { va = new ASNValueAssignment(context_, idt(l)); a = va; }
-	t2=type { va.setEntityType(t2); }
-	ASSIGN_OP v=value { va.setValue(v); }
+ 	l:LOWER	t2=type	ASSIGN_OP v=value { a = makeValueAssignment(l, t2, v); }
 |
-        (u2:UPPER                       { ma = new ASNMacroDefinition(context_, idt(u2)); a = ma; }
-        | m=macroName                   { ma = new ASNMacroDefinition(context_, idt(m)); a = ma; }
-        ) "MACRO" ASSIGN_OP 
+    (u2:UPPER | m=macroName)          { a = ma = makeMacroDefinition(u2 != null ? u2 : m); }
+    "MACRO" ASSIGN_OP
             BEGIN_KW (t:~(END_KW)       { ma.getTokens().add(t.getText()); }
                      )* END_KW
 ;

@@ -29,8 +29,8 @@ public class ASNMacroDefinition extends ASNAssignment {
     
     private List<String> tokens_ = new ArrayList<String>();
     
-    public ASNMacroDefinition(Context context, IdToken idToken) {
-    	super(context, idToken);
+    public ASNMacroDefinition(ASNModule module, IdToken idToken) {
+    	super(module, idToken);
     	
         setType (Type.MACRODEF);
     }

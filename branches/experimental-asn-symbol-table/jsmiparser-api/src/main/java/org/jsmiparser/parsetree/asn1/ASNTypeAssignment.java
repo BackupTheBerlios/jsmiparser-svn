@@ -28,8 +28,8 @@ public class ASNTypeAssignment extends ASNAssignment {
     private ASNType entityType;
 
     /** Creates a new instance of ASNTypeAssignment */
-    public ASNTypeAssignment(Context context, IdToken idToken) {
-        super(context, idToken);
+    public ASNTypeAssignment(ASNModule module, IdToken idToken) {
+        super(module, idToken);
         setType (Type.TYPE);
     }
 

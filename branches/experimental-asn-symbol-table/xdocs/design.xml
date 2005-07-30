@@ -319,12 +319,14 @@
 		    parent (type or ASNTypeAssignment).
 		</li>
 		<li>
-		    DefinedType references: need a good, transparent
-		    solution. Ideally, we should not have a
-		    DefinedType class: the ASNType should be returned
-		    immediately, but we just cannot know which class
-		    it would be, so it cannot be instantiated. We'll
-		    need an intermediate pass then. A good approach might be to 
+		    ASNDefinedType references: need a good,
+		    transparent solution. Ideally, we should not have
+		    a DefinedType class: the ASNType should be
+		    returned immediately, but we just cannot know
+		    which class it would be, so it cannot be
+		    instantiated. We'll need an intermediate pass
+		    then. Another problem here are the constraints:
+		    they are located in the ASNDefinedType class.
 		</li>
 		<li>
 		    Keeping track of usages, and especially their

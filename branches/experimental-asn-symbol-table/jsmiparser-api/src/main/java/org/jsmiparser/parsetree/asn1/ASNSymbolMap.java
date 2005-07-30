@@ -28,22 +28,19 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
     private static final Logger m_log = Logger.getLogger(ASNSymbolMap.class);
 
     private ASNModule m_module;
-    private Context m_context;
 
     // TODO use a multimap that also stores the duplicates?
     // unresolved elements are in here as well, with an empty value
     private Map<String, Assignment> m_map = new HashMap<String, Assignment>();
-    private Map<String, Assignment> m_importedMap = new HashMap<String, Assignment>();
 
     private Constructor<Assignment> m_constructor;
     private Class<Assignment> m_assigmentClass;
 
-    public ASNSymbolMap(ASNModule module, Context context, Class<Assignment> assignmentClass) {
+    public ASNSymbolMap(ASNModule module, Class<Assignment> assignmentClass) {
         m_module = module;
-        m_context = context;
         m_assigmentClass = assignmentClass;
         try {
-            m_constructor = assignmentClass.getConstructor(Context.class, IdToken.class);
+            m_constructor = assignmentClass.getConstructor(ASNModule.class, IdToken.class);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
@@ -79,13 +76,12 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
         return result;
     }
 
-    private Assignment findImport(IdToken id) {
+    private Assignment findImport(IdToken idToken) {
         for (ASNImports imports : m_module.getImports()) {
             for (ASNAssignment assignment : imports.getSymbols()) {
-                if (assignment != null) { // TODO remove this test when value and macro symbol tables are implemented
-                    if (assignment.getName().equals(id.getId()) && m_assigmentClass.isInstance(assignment)) {
-                        return m_assigmentClass.cast(assignment);
-                    }
+                //if (assignment != null) { // TODO remove this test when value and macro symbol tables are implemented
+                if (assignment.getName().equals(idToken.getId()) && m_assigmentClass.isInstance(assignment)) {
+                    return m_assigmentClass.cast(assignment);
                 }
             }
         }
@@ -110,9 +106,9 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
     }
 
 
-    private Assignment newInstance(IdToken id) {
+    private Assignment newInstance(IdToken idToken) {
         try {
-            return m_constructor.newInstance(m_context, id);
+            return m_constructor.newInstance(m_module, idToken);
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
@@ -124,29 +120,29 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
         }
     }
 
-    public Assignment create(IdToken token) {
-        Assignment result = m_map.get(token.getId());
+    public Assignment create(IdToken idToken) {
+        Assignment result = m_map.get(idToken.getId());
         if (result == null) {
             // plain and simple case: the symbol wasn't there, and was never referenced either.
-            result = newInstance(token);
-            m_map.put(token.getId(), result);
+            result = newInstance(idToken);
+            m_map.put(idToken.getId(), result);
         } else {
             if (result.getModule() != m_module) {
-                //TODO m_log.warn("created symbol " + token.getId() + " in " + m_module.getName() + " is part of " + result.getModule().getName());
+                m_log.warn("created symbol " + idToken.getId() + " in " + m_module.getName() + " is part of " + result.getModule().getName());
             }
             if (result.getRightHandSide() != null) { // It is effectively resolved
                 // TODO error duplicate
-                result = newInstance(token); // return dummy new instance
+                result = newInstance(idToken); // return dummy new instance
                 // TODO register duplicate in multimap?
             } else {
-                // The token must be the correct one, to ensure the right location
-                result.setIdToken(token);
+                // The idToken must be the correct one, to ensure the right location
+                result.setIdToken(idToken);
             }
         }
-        assert(result.getIdToken() == token);
-        if ("DisplayString".equals(result.getName()) && m_log.isDebugEnabled()) {
-            m_log.debug("Created " + token);
-        }
+//        if (m_log.isDebugEnabled()) {
+//            m_log.debug("Created " + idToken + " " + result.getIdToken());
+//        }
+        assert(result.getIdToken() == idToken);
         return result;
     }
 

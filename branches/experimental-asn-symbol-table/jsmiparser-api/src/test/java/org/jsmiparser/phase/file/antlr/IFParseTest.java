@@ -18,15 +18,13 @@ package org.jsmiparser.phase.file.antlr;
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
 import junit.framework.TestCase;
-import org.jsmiparser.parsetree.asn1.ASNAssignment;
-import org.jsmiparser.parsetree.asn1.ASNModule;
-import org.jsmiparser.parsetree.asn1.ASNTypeAssignment;
-import org.jsmiparser.parsetree.asn1.ASNType;
-import org.jsmiparser.phase.file.ASNMibParserImpl;
 import org.apache.log4j.Logger;
+import org.jsmiparser.parsetree.asn1.*;
+import org.jsmiparser.parsetree.smi.SMITextualConventionMacro;
+import org.jsmiparser.phase.file.ASNMibParserImpl;
 
-import java.io.InputStream;
 import java.io.BufferedInputStream;
+import java.io.InputStream;
 
 /**
  * @author davy
@@ -78,6 +76,12 @@ public class IFParseTest extends TestCase {
         ASNType entityType = ta.getEntityType();
         assertNotNull(entityType);
         assertEquals(ASNType.Enum.SMITEXTUALCONVENTIONMACRO, entityType.getType());
+
+        ASNTypeAssignment iiAssignment = module.findTypeAssignment("InterfaceIndex");
+        SMITextualConventionMacro iiTextualConvention = (SMITextualConventionMacro) iiAssignment.getEntityType();
+        ASNDefinedType iiSyntax = (ASNDefinedType) iiTextualConvention.getSyntax();
+        assertEquals("Integer32", iiSyntax.getTypeAssignment().getName());
+        assertEquals("SNMPv2-SMI", iiSyntax.getTypeAssignment().getModule().getName());
 
 //		PrintWriter out = new PrintWriter(System.out);
 //		module.print(out);
