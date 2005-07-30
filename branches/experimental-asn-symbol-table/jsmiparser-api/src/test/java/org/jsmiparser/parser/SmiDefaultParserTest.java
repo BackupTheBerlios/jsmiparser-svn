@@ -82,12 +82,14 @@ public class SmiDefaultParserTest extends TestCase {
             assertTrue(dir.toString(), dir.exists());
             assertTrue(dir.toString(), dir.isDirectory());
 
+            options.getUsedDirList().add(dir);
             File[] files = dir.listFiles();
             for (int i = 0; i < files.length; i++) {
                 File file = files[i];
 
                 if (file.isFile()
                         && !file.getName().startsWith("Makefile")) {
+                        //&& !file.getName().endsWith("-orig")) { // TODO parsing -orig should give more errors!
                     options.addFile(file);
                 }
             }

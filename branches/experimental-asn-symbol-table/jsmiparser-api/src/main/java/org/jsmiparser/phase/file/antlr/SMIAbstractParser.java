@@ -24,7 +24,7 @@ import org.jsmiparser.parsetree.smi.SMIStatus;
 import org.jsmiparser.util.location.Location;
 import org.jsmiparser.util.location.LocationFactory;
 import org.jsmiparser.util.token.IdToken;
-import org.jsmiparser.phase.file.ASNMibParserImpl;
+import org.jsmiparser.phase.file.FileParserPhase;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public abstract class SMIAbstractParser extends LLkParser implements Context {
     protected Context context_ = this;
 
     private String m_source;
-    private ASNMibParserImpl m_mibParser; // TODO
+    private FileParserPhase m_fileParserPhase; // TODO
 
     public SMIAbstractParser(int k) {
         super(k);
@@ -58,12 +58,12 @@ public abstract class SMIAbstractParser extends LLkParser implements Context {
         super(tokenStream, k);
     }
 
-    public void init(String source, ASNMibParserImpl mibParser) {
+    public void init(String source, FileParserPhase fileParserPhase) {
         m_source = source;
         m_locationFactory = new AntlrLocationFactory(this, source);
 
-        m_mibParser = mibParser;
-        m_mibParser.setContext(this);
+        m_fileParserPhase = fileParserPhase;
+        m_fileParserPhase.setContext(this);
     }
 
     public String getSource() {
@@ -87,7 +87,7 @@ public abstract class SMIAbstractParser extends LLkParser implements Context {
     }
 
     protected ASNModule makeModule(Token nameToken) {
-        m_module = m_mibParser.create(idt(nameToken));
+        m_module = m_fileParserPhase.create(idt(nameToken));
         return m_module;
     }
 
@@ -100,7 +100,7 @@ public abstract class SMIAbstractParser extends LLkParser implements Context {
 
     protected ASNImports makeImports(List<Token> importTokens, Token fromModuleToken) {
         IdToken moduleToken = idt(fromModuleToken);
-        ASNModule importedModule = m_mibParser.use(moduleToken);
+        ASNModule importedModule = m_fileParserPhase.use(moduleToken);
         ASNImports result = new ASNImports(context_, moduleToken, importedModule);
         for (Token token : importTokens) {
             result.addAssigment(idt(token));
@@ -228,7 +228,7 @@ public abstract class SMIAbstractParser extends LLkParser implements Context {
         ASNDefinedType result = new ASNDefinedType(context_);
 
         if (moduleToken != null) {
-            ASNModule module = m_mibParser.use(idt(moduleToken));
+            ASNModule module = m_fileParserPhase.use(idt(moduleToken));
             ASNTypeAssignment ta = module.getTypeMap().use(idt(idToken));
             result.setTypeAssignment(ta);
         } else {
@@ -242,7 +242,7 @@ public abstract class SMIAbstractParser extends LLkParser implements Context {
     protected ASNDefinedValue makeDefinedValue(Token moduleToken, Token idToken) {
         ASNDefinedValue result = new ASNDefinedValue(context_);
         if (moduleToken != null) {
-            ASNModule module = m_mibParser.use(idt(moduleToken));
+            ASNModule module = m_fileParserPhase.use(idt(moduleToken));
             ASNValueAssignment va = module.getValueMap().use(idt(idToken));
             result.setValueAssignment(va);
         } else {

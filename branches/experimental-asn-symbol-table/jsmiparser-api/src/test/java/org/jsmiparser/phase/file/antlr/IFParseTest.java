@@ -21,7 +21,9 @@ import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import org.jsmiparser.parsetree.asn1.*;
 import org.jsmiparser.parsetree.smi.SMITextualConventionMacro;
-import org.jsmiparser.phase.file.ASNMibParserImpl;
+import org.jsmiparser.phase.file.FileParserPhase;
+import org.jsmiparser.util.problem.DefaultProblemEventHandler;
+import org.jsmiparser.util.problem.DefaultProblemReporterFactory;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -46,7 +48,9 @@ public class IFParseTest extends TestCase {
 
         SMILexer lexer = new SMILexer(is);
         SMIParser parser = new SMIParser(lexer);
-        parser.init("/IF-MIB", new ASNMibParserImpl());
+        FileParserPhase fileParserPhase = new FileParserPhase(new DefaultProblemReporterFactory(new DefaultProblemEventHandler()),
+                AntlrFileParser.class);
+        parser.init("/IF-MIB", fileParserPhase);
 
         ASNModule module = parser.module_definition();
 

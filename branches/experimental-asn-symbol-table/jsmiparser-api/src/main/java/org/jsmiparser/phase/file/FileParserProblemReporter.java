@@ -15,23 +15,15 @@
  */
 package org.jsmiparser.phase.file;
 
-import org.apache.log4j.Logger;
+import org.jsmiparser.util.token.IdToken;
+import org.jsmiparser.util.problem.annotations.ProblemMethod;
 import org.jsmiparser.parsetree.asn1.ASNModule;
-import org.jsmiparser.parsetree.asn1.Context;
 
-import java.util.HashMap;
-import java.util.Map;
+public interface FileParserProblemReporter {
 
-public class ASNMibParserImpl {
-    private static final Logger m_log = Logger.getLogger(ASNMibParserImpl.class);
+    @ProblemMethod(message = "Cannot find file for module %s")
+    void reportCannotFindModuleFile(IdToken moduleToken);
 
-    private Map<String,ASNModule> m_moduleMap = new HashMap<String, ASNModule>();
-    private Context m_context;
-
-    public ASNMibParserImpl() {
-
-    }
-
-
-
+    @ProblemMethod(message = "Duplicate module %s originally defined at %s")
+    void reportDuplicateModule(ASNModule duplicate, ASNModule original);
 }

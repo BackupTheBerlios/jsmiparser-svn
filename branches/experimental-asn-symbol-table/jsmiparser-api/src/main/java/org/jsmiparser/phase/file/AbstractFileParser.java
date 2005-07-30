@@ -15,23 +15,28 @@
  */
 package org.jsmiparser.phase.file;
 
-import org.apache.log4j.Logger;
-import org.jsmiparser.parsetree.asn1.ASNModule;
-import org.jsmiparser.parsetree.asn1.Context;
+import java.io.File;
 
-import java.util.HashMap;
-import java.util.Map;
+public abstract class AbstractFileParser implements FileParser {
 
-public class ASNMibParserImpl {
-    private static final Logger m_log = Logger.getLogger(ASNMibParserImpl.class);
+    protected FileParserPhase m_fileParserPhase;
+    protected File m_file;
+    protected State m_state = State.UNPARSED;
 
-    private Map<String,ASNModule> m_moduleMap = new HashMap<String, ASNModule>();
-    private Context m_context;
-
-    public ASNMibParserImpl() {
-
+    protected AbstractFileParser(FileParserPhase fileParserPhase, File file) {
+        m_fileParserPhase = fileParserPhase;
+        m_file = file;
     }
 
+    public FileParserPhase getFileParserPhase() {
+        return m_fileParserPhase;
+    }
 
+    public File getFile() {
+        return m_file;
+    }
 
+    public State getState() {
+        return m_state;
+    }
 }

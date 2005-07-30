@@ -22,5 +22,11 @@ import java.io.File;
 
 public interface FileParser {
 
-    ASNModule parse(File file, ASNMibParserImpl mibParser) throws PhaseException;
+    enum State { UNPARSED, PARSING, PARSED }
+
+    ASNModule parse() throws PhaseException;
+
+    File getFile();
+    
+    State getState();
 }

@@ -27,6 +27,14 @@ public class FileParserOptions {
     private List<File> m_usedFileList = new ArrayList<File>();
     private List<File> m_inputFileList = new ArrayList<File>();
 
+    private List<String> m_extensions = new ArrayList<String>();
+
+    public FileParserOptions() {
+        m_extensions.add(".mib");
+        m_extensions.add(".smi");
+        m_extensions.add(".asn");
+    }
+
     public List<File> getUsedDirList() {
         return m_usedDirList;
     }
@@ -62,4 +70,31 @@ public class FileParserOptions {
     public void addFile(File file) {
         m_inputFileList.add(file);
     }
+
+    public List<String> getExtensions() {
+        return m_extensions;
+    }
+
+    public void setExtensions(List<String> extensions) {
+        m_extensions = extensions;
+    }
+
+    public File findFile(String moduleName) {
+		for (File dir : m_usedDirList) {
+			File file = new File(dir, moduleName);
+			if (file.exists()) {
+				return file;
+			}
+		}
+
+		for (File dir : m_usedDirList) {
+			for (String ext : m_extensions) {
+				File file = new File(dir, moduleName + ext);
+				if (file.exists()) {
+					return file;
+				}
+			}
+		}
+		return null;
+	}
 }

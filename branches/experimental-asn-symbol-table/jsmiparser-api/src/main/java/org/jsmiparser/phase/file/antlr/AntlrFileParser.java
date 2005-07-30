@@ -19,23 +19,29 @@ import antlr.RecognitionException;
 import antlr.TokenStreamException;
 import org.jsmiparser.parsetree.asn1.ASNModule;
 import org.jsmiparser.phase.PhaseException;
-import org.jsmiparser.phase.file.FileParser;
-import org.jsmiparser.phase.file.ASNMibParserImpl;
+import org.jsmiparser.phase.file.AbstractFileParser;
+import org.jsmiparser.phase.file.FileParserPhase;
 
 import java.io.*;
 
-public class AntlrFileParser implements FileParser {
+public class AntlrFileParser extends AbstractFileParser {
 
-    public ASNModule parse(File file, ASNMibParserImpl mibParser) throws PhaseException {
+    public AntlrFileParser(FileParserPhase fileParserPhase, File file) {
+        super(fileParserPhase, file);
+    }
 
+    public ASNModule parse() throws PhaseException {
+        assert(m_state == State.UNPARSED);
         try {
-            InputStream is = new BufferedInputStream(new FileInputStream(file));
+            m_state = State.PARSING;
+            InputStream is = new BufferedInputStream(new FileInputStream(m_file));
             SMILexer lexer = new SMILexer(is);
             SMIParser parser = new SMIParser(lexer);
-            parser.init(file.getPath(), mibParser);
+            parser.init(m_file.getPath(), m_fileParserPhase);
             
             ASNModule module = parser.module_definition();
             is.close();
+            
             return module;
         } catch (FileNotFoundException e) {
             throw new PhaseException(e);
@@ -45,6 +51,8 @@ public class AntlrFileParser implements FileParser {
             throw new PhaseException(e);
         } catch (IOException e) {
             throw new PhaseException(e);
+        } finally {
+            m_state = State.PARSED;
         }
     }
 }

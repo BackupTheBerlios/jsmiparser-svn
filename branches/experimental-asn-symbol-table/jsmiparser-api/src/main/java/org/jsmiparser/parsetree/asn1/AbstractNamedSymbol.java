@@ -64,4 +64,8 @@ public abstract class AbstractNamedSymbol extends AbstractSymbol implements Name
         }
         return m_users;
     }
+
+    public String toString() {
+        return m_idToken.toString();
+    }
 }

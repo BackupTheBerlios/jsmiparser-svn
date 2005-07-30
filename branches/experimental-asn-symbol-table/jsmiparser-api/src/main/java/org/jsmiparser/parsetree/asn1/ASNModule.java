@@ -36,6 +36,7 @@ public class ASNModule extends AbstractNamedSymbol {
         SPPI
     }
 
+    private ASNMib m_mib;
     private Type type;
     private boolean explicitTags;
     private boolean implicitTags;
@@ -54,13 +55,24 @@ public class ASNModule extends AbstractNamedSymbol {
     /**
      * Creates a new instance of ASNModule
      */
-    public ASNModule(Context context, IdToken idToken) {
-        super(context, idToken);
+    public ASNModule(ASNMib mib, IdToken idToken) {
+        super((ASNModule) null, idToken); // TODO remove cast
+        m_module = this;
+        m_mib = mib;
         type = Type.ASN1;
 
+        if (m_mib != null) { // for testing purposes
+            m_mib.addModule(this);
+        }
+
+        // TODO remove
         m_typeMap = new ASNSymbolMap<ASNTypeAssignment>(this, ASNTypeAssignment.class);
         m_valueMap = new ASNSymbolMap<ASNValueAssignment>(this, ASNValueAssignment.class);
         m_macroMap = new ASNSymbolMap<ASNMacroDefinition>(this, ASNMacroDefinition.class);
+    }
+
+    public ASNMib getMib() {
+        return m_mib;
     }
 
     public void setType(Type t) {

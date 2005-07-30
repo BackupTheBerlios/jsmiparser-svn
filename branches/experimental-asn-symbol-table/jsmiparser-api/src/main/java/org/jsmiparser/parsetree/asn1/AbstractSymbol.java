@@ -23,7 +23,7 @@ import org.jsmiparser.util.location.Location;
  */
 public abstract class AbstractSymbol implements Symbol {
 
-    private ASNModule m_module;
+    protected ASNModule m_module;
     private Location m_location;
 
     // TODO remove
