@@ -22,15 +22,18 @@ import org.jsmiparser.parsetree.asn1.ASNAssignment;
 import org.jsmiparser.parsetree.asn1.ASNModule;
 import org.jsmiparser.parsetree.asn1.ASNTypeAssignment;
 import org.jsmiparser.parsetree.asn1.ASNType;
+import org.jsmiparser.phase.file.ASNMibParserImpl;
+import org.apache.log4j.Logger;
 
 import java.io.InputStream;
 import java.io.BufferedInputStream;
 
 /**
  * @author davy
- *
  */
 public class IFParseTest extends TestCase {
+
+    private static final Logger m_log = Logger.getLogger(IFParseTest.class);
 
     /**
      *
@@ -45,7 +48,7 @@ public class IFParseTest extends TestCase {
 
         SMILexer lexer = new SMILexer(is);
         SMIParser parser = new SMIParser(lexer);
-        parser.setSource("/IF-MIB");
+        parser.init("/IF-MIB", new ASNMibParserImpl());
 
         ASNModule module = parser.module_definition();
 
@@ -62,6 +65,12 @@ public class IFParseTest extends TestCase {
         assertNotNull(a);
         assertEquals(1741, a.getLocation().getLine());
 
+        if (m_log.isDebugEnabled()) {
+            for (ASNTypeAssignment ta : module.getTypeMap().getAll()) {
+                m_log.debug(ta.getModule().getIdToken() + " " + ta.getIdToken());
+            }
+        }
+        m_log.debug(module.getTypeMap());
         assertEquals(8, module.getTypeMap().size());
 
         ASNTypeAssignment ta = module.findTypeAssignment("InterfaceIndexOrZero");

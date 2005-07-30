@@ -33,11 +33,15 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
     // TODO use a multimap that also stores the duplicates?
     // unresolved elements are in here as well, with an empty value
     private Map<String, Assignment> m_map = new HashMap<String, Assignment>();
+    private Map<String, Assignment> m_importedMap = new HashMap<String, Assignment>();
+
     private Constructor<Assignment> m_constructor;
+    private Class<Assignment> m_assigmentClass;
 
     public ASNSymbolMap(ASNModule module, Context context, Class<Assignment> assignmentClass) {
         m_module = module;
         m_context = context;
+        m_assigmentClass = assignmentClass;
         try {
             m_constructor = assignmentClass.getConstructor(Context.class, IdToken.class);
         } catch (NoSuchMethodException e) {
@@ -51,15 +55,60 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
         return m_map.get(id);
     }
 
-
+    /**
+     * This is to be used when resolving symbols within this module.
+     */
     public Assignment resolve(IdToken id) {
+        // TODO: this doesn't work because the Context always assigns the module that is currently parsed.
+        // assert(id.getLocation().getSource() == m_module.getLocation().getSource());
+        // TODO
+
         Assignment result = m_map.get(id.getId());
+
+        if (result == null) {
+            result = findImport(id);
+        }
+
         if (result == null) {
             result = newInstance(id);
             m_map.put(id.getId(), result);
         }
+
+        result.addUser(id);
+
         return result;
     }
+
+    private Assignment findImport(IdToken id) {
+        for (ASNImports imports : m_module.getImports()) {
+            for (ASNAssignment assignment : imports.getSymbols()) {
+                if (assignment != null) { // TODO remove this test when value and macro symbol tables are implemented
+                    if (assignment.getName().equals(id.getId()) && m_assigmentClass.isInstance(assignment)) {
+                        return m_assigmentClass.cast(assignment);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Other module use a symbol (supposedly) defined in this module.
+     */
+    public Assignment use(IdToken idToken) {
+        //assert(!idToken.getLocation().getSource().equals(m_module.getLocation().getSource()));
+
+        Assignment result = m_map.get(idToken.getId());
+        if (result == null) {
+            result = newInstance(idToken);
+            m_map.put(idToken.getId(), result);
+        }
+
+        result.addUser(idToken);
+
+        return result;
+    }
+
 
     private Assignment newInstance(IdToken id) {
         try {
@@ -82,7 +131,9 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
             result = newInstance(token);
             m_map.put(token.getId(), result);
         } else {
-            assert(result.getModule() == m_module);
+            if (result.getModule() != m_module) {
+                //TODO m_log.warn("created symbol " + token.getId() + " in " + m_module.getName() + " is part of " + result.getModule().getName());
+            }
             if (result.getRightHandSide() != null) { // It is effectively resolved
                 // TODO error duplicate
                 result = newInstance(token); // return dummy new instance
@@ -93,6 +144,9 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
             }
         }
         assert(result.getIdToken() == token);
+        if ("DisplayString".equals(result.getName()) && m_log.isDebugEnabled()) {
+            m_log.debug("Created " + token);
+        }
         return result;
     }
 
@@ -103,4 +157,6 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
     public int size() {
         return m_map.size();
     }
+
+
 }

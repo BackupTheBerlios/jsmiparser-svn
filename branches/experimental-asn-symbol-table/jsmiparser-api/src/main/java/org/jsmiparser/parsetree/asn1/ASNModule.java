@@ -175,6 +175,40 @@ public class ASNModule extends AbstractNamedSymbol {
         return m_typeMap.find(id);
     }
 
+    public ASNAssignment create(IdToken idToken) {
+        ASNAssignment result = null;
+        switch (ASNAssignment.determineType(idToken)) {
+            case MACRODEF:
+                // TODO
+                break;
+            case TYPE:
+                result = m_typeMap.create(idToken);
+                break;
+            case VALUE:
+                // TODO
+                break;
+        }
+        return result;
+    }
+
+    public ASNAssignment use(IdToken idToken) {
+        ASNAssignment result = null;
+        switch (ASNAssignment.determineType(idToken)) {
+            case MACRODEF:
+                // TODO
+                break;
+            case TYPE:
+                result = m_typeMap.use(idToken);
+                break;
+            case VALUE:
+                // TODO
+                break;
+        }
+        return result;
+    }
+
+
+
     public void print(PrintWriter out)
 	{
 		out.println(getModuleName());

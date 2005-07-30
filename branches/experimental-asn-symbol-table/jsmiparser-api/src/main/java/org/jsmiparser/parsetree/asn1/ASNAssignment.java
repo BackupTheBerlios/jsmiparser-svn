@@ -19,13 +19,11 @@ package org.jsmiparser.parsetree.asn1;
 import org.jsmiparser.util.token.IdToken;
 
 /**
- *
- * @author  Nigel Sheridan-Smith
+ * @author Nigel Sheridan-Smith
  */
 public abstract class ASNAssignment extends AbstractNamedSymbol {
 
-    enum Type
-    {
+    enum Type {
         UNKNOWN,
         TYPE,
         VALUE,
@@ -35,20 +33,34 @@ public abstract class ASNAssignment extends AbstractNamedSymbol {
 
     private Type type;
 
-    /** Creates a new instance of ASNAssignment
+    /**
+     * Creates a new instance of ASNAssignment
      */
     public ASNAssignment(Context context, IdToken idToken) {
         super(context, idToken);
-        setType (Type.UNKNOWN);
+        setType(Type.UNKNOWN);
     }
 
-    public void setType (Type t)
-    {
+    public static Type determineType(IdToken idToken) {
+        Type result = Type.UNKNOWN;
+        String id = idToken.getId();
+        if (Character.isLowerCase(id.charAt(0))) {
+            result = Type.VALUE;
+        } else {
+            if (id.toUpperCase().equals(id)) {
+                result = Type.MACRODEF;
+            } else {
+                result = Type.TYPE;
+            }
+        }
+        return result;
+    }
+
+    public void setType(Type t) {
         type = t;
     }
 
-    public Type getType ()
-    {
+    public Type getType() {
         return type;
     }
 

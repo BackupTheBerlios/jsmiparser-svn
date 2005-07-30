@@ -20,6 +20,7 @@ import org.jsmiparser.parsetree.asn1.ASNModule;
 import org.jsmiparser.phase.Phase;
 import org.jsmiparser.phase.PhaseException;
 import org.jsmiparser.util.problem.ProblemReporterFactory;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 
@@ -27,11 +28,14 @@ import java.io.File;
 
 public class FileParserPhase implements Phase {
 
+    private static final Logger m_log = Logger.getLogger(FileParserPhase.class);
+
     private ProblemReporterFactory m_problemReporterFactory;
     private Class m_fileParserClass;
 
     private ASNFileFinder fileFinder_;
     private FileParserOptions m_options = new FileParserOptions();
+    private ASNMibParserImpl m_mibParser = new ASNMibParserImpl(); // TODO
 
     public FileParserPhase(ProblemReporterFactory prf, Class fileParserClass) {
         super();
@@ -49,8 +53,9 @@ public class FileParserPhase implements Phase {
 
     private ASNModule parseFile(File file) throws PhaseException {
         try {
+            m_log.debug("Parsing " + file);
             FileParser fileParser = (FileParser) m_fileParserClass.newInstance();
-            return fileParser.parse(file);
+            return fileParser.parse(file, m_mibParser);
         } catch (InstantiationException e) {
             throw new PhaseException(e);
         } catch (IllegalAccessException e) {

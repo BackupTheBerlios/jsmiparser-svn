@@ -22,5 +22,5 @@ import java.io.File;
 
 public interface FileParser {
 
-    ASNModule parse(File file) throws PhaseException;
+    ASNModule parse(File file, ASNMibParserImpl mibParser) throws PhaseException;
 }

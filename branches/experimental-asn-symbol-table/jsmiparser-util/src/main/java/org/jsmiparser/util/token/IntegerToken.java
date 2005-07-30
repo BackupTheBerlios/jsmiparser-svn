@@ -23,7 +23,7 @@ public class IntegerToken extends AbstractToken {
 
     protected IntegerToken(Location location, int value) {
         super(location);
-        m_value =  value;
+        m_value = value;
     }
 
     public int getValue() {
@@ -32,5 +32,9 @@ public class IntegerToken extends AbstractToken {
 
     public Integer getObject() {
         return m_value;
+    }
+
+    public String toString() {
+        return getLocation().toString() + Location.SEPARATOR + m_value;
     }
 }

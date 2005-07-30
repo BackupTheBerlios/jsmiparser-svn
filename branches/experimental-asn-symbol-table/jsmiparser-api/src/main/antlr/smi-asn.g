@@ -311,8 +311,8 @@ tag_default returns [ASNTag.Type s=ASNTag.Type.UNKNOWN]
     | s3:AUTOMATIC_KW                   {s=ASNTag.Type.AUTOMATIC;};
 
 exports returns [ASNExports e = new ASNExports()]
-                                        {List<String> l=null;}
-    : EXPORTS_KW ( ( l=symbol_list      {e.setExports(l);}
+                                        {List<Token> l=null;}
+    : EXPORTS_KW ( ( l=symbol_list      {makeExports(l);}
                    )? | ALL_KW          {e.setAllExported(true);}
                  ) SEMI;
 
@@ -347,15 +347,18 @@ assignment  returns [ASNAssignment a = null]
                      )* END_KW
 ;
 
-symbol_list returns [List<String> l = new ArrayList<String>()]
-                                        {String s1=null,s2=null;}
-    : s1=symbol                         {l.add(s1);}
+symbol_list returns [List<Token> l = new ArrayList<Token>()]
+{
+    Token s1=null,s2=null;
+}
+:   s1=symbol                         {l.add(s1);}
       (COMMA s2=symbol                  {l.add(s2);}
-      )* ;
+      )*
+;
 
 symbols_from_module returns [ASNImports i = null]
 {
-	List<String> s = null;
+	List<Token> s = null;
 	ASNOidComponentList o=null;
 	ASNDefinedValue d=null;
 }
@@ -366,11 +369,10 @@ symbols_from_module returns [ASNImports i = null]
         )? 
 ;
 
-symbol returns [String s=null]
-	{ Token st = null; }
-    : u:UPPER                           {s=u.getText();}
-    | l:LOWER                           {s=l.getText();}
-    | st=macroName                      {s=st.getText();}
+symbol returns [Token s=null]
+    : u:UPPER                           { s=u; }
+    | l:LOWER                           { s=l; }
+    | s=macroName
     ;
 
 macroName returns [Token s=null]
@@ -439,12 +441,15 @@ built_in_type returns [ASNType t = null]
     | t=setof_type
     | t=tagged_type;
 
-defined_type returns [ASNDefinedType d = new ASNDefinedType(context_)]
-                                        {ASNConstraint c=null;}
-    : (u1:UPPER                         {d.setModuleReference (u1.getText());}
-        DOT)? u2:UPPER                  {d.setTypeReference (u2.getText());}
-        (c=constraint                   {d.setConstraint (c);}
-        )? ;
+defined_type returns [ASNDefinedType d = null]
+{
+    ASNConstraint c=null;
+}
+    : (m:UPPER DOT)? t:UPPER (c=constraint)?
+{
+    d = makeDefinedType(m, t, c);
+}
+;
 
 selection_type returns [ASNSelectionType s = new ASNSelectionType(context_)]
                                         {ASNType t=null;}

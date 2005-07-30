@@ -20,18 +20,19 @@ import antlr.TokenStreamException;
 import org.jsmiparser.parsetree.asn1.ASNModule;
 import org.jsmiparser.phase.PhaseException;
 import org.jsmiparser.phase.file.FileParser;
+import org.jsmiparser.phase.file.ASNMibParserImpl;
 
 import java.io.*;
 
 public class AntlrFileParser implements FileParser {
 
-    public ASNModule parse(File file) throws PhaseException {
+    public ASNModule parse(File file, ASNMibParserImpl mibParser) throws PhaseException {
 
         try {
             InputStream is = new BufferedInputStream(new FileInputStream(file));
             SMILexer lexer = new SMILexer(is);
             SMIParser parser = new SMIParser(lexer);
-            parser.setSource(file.toString());
+            parser.init(file.getPath(), mibParser);
             
             ASNModule module = parser.module_definition();
             is.close();
