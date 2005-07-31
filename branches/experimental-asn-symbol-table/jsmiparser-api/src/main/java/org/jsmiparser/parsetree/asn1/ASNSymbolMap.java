@@ -17,6 +17,7 @@ package org.jsmiparser.parsetree.asn1;
 
 import org.apache.log4j.Logger;
 import org.jsmiparser.util.token.IdToken;
+import org.jsmiparser.phase.file.FileParserProblemReporter;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import java.util.Collection;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+// TODO move to phase.parser package
 public class ASNSymbolMap<Assignment extends ASNAssignment> {
     private static final Logger m_log = Logger.getLogger(ASNSymbolMap.class);
 
@@ -35,9 +37,11 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
 
     private Constructor<Assignment> m_constructor;
     private Class<Assignment> m_assigmentClass;
+    private FileParserProblemReporter m_pr;
 
-    public ASNSymbolMap(ASNModule module, Class<Assignment> assignmentClass) {
+    public ASNSymbolMap(FileParserProblemReporter fileParserProblemReporter, ASNModule module, Class<Assignment> assignmentClass) {
         m_module = module;
+        m_pr = fileParserProblemReporter;
         m_assigmentClass = assignmentClass;
         try {
             m_constructor = assignmentClass.getConstructor(ASNModule.class, IdToken.class);
@@ -130,8 +134,9 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
                 m_log.warn("created symbol " + idToken.getId() + " in " + m_module.getName() + " is part of " + result.getModule().getName());
             }
             if (result.getRightHandSide() != null) { // It is effectively resolved
-                // TODO error duplicate
-                result = newInstance(idToken); // return dummy new instance
+                Assignment n = newInstance(idToken); // return dummy new instance
+                m_pr.reportDuplicateAssignment(n, result);
+                result = n;
                 // TODO register duplicate in multimap?
             } else {
                 // The idToken must be the correct one, to ensure the right location

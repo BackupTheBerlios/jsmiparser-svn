@@ -37,9 +37,10 @@ public abstract class AbstractFileParser implements FileParser {
     }
 
     private void init() {
-        m_typeMap = new ASNSymbolMap<ASNTypeAssignment>(m_module, ASNTypeAssignment.class);
-        m_valueMap = new ASNSymbolMap<ASNValueAssignment>(m_module, ASNValueAssignment.class);
-        m_macroMap = new ASNSymbolMap<ASNMacroDefinition>(m_module, ASNMacroDefinition.class);
+        assert(m_module != null);
+        m_typeMap = new ASNSymbolMap<ASNTypeAssignment>(m_fileParserPhase.getFileParserProblemReporter(), m_module, ASNTypeAssignment.class);
+        m_valueMap = new ASNSymbolMap<ASNValueAssignment>(m_fileParserPhase.getFileParserProblemReporter(), m_module, ASNValueAssignment.class);
+        m_macroMap = new ASNSymbolMap<ASNMacroDefinition>(m_fileParserPhase.getFileParserProblemReporter(), m_module, ASNMacroDefinition.class);
     }
 
     public FileParserPhase getFileParserPhase() {

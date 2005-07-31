@@ -22,24 +22,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- * @author  Nigel Sheridan-Smith
+ * @author Nigel Sheridan-Smith
  */
 public class ASNMacroDefinition extends ASNAssignment {
-    
-    private List<String> tokens_ = new ArrayList<String>();
-    
+
+    private List<String> m_tokens = new ArrayList<String>();
+
     public ASNMacroDefinition(ASNModule module, IdToken idToken) {
-    	super(module, idToken);
-    	
-        setType (Type.MACRODEF);
+        super(module, idToken);
+
+        setType(Type.MACRODEF);
     }
 
     public Symbol getRightHandSide() {
-        return this;
+        if (m_tokens.isEmpty()) {
+            return null;
+        } else {
+            return this;
+        }
     }
 
     public List<String> getTokens() {
-        return tokens_;
+        return m_tokens;
     }
 }

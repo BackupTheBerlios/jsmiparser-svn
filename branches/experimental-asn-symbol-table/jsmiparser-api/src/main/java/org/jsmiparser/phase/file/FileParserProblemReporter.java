@@ -18,6 +18,7 @@ package org.jsmiparser.phase.file;
 import org.jsmiparser.util.token.IdToken;
 import org.jsmiparser.util.problem.annotations.ProblemMethod;
 import org.jsmiparser.parsetree.asn1.ASNModule;
+import org.jsmiparser.parsetree.asn1.ASNAssignment;
 
 public interface FileParserProblemReporter {
 
@@ -26,4 +27,7 @@ public interface FileParserProblemReporter {
 
     @ProblemMethod(message = "Duplicate module %s originally defined at %s")
     void reportDuplicateModule(ASNModule duplicate, ASNModule original);
+
+    @ProblemMethod(message = "Duplicate assignment %s originally defined at %s")
+    void reportDuplicateAssignment(ASNAssignment duplicate, ASNAssignment original);
 }

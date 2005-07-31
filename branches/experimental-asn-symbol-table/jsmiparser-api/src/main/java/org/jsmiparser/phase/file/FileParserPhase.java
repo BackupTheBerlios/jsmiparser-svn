@@ -16,7 +16,6 @@
 package org.jsmiparser.phase.file;
 
 import org.jsmiparser.parsetree.asn1.ASNMib;
-import org.jsmiparser.parsetree.asn1.ASNModule;
 import org.jsmiparser.parsetree.asn1.Context;
 import org.jsmiparser.phase.Phase;
 import org.jsmiparser.phase.PhaseException;
@@ -28,7 +27,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.HashMap;
 
 // TODO allow any URL's
 
@@ -41,7 +39,6 @@ public class FileParserPhase implements Phase {
 
     private FileParserOptions m_options = new FileParserOptions();
     private Map<File, FileParser> m_fileParserMap = new LinkedHashMap<File, FileParser>();
-    private Map<String, ASNModule> m_createdModuleMap = new HashMap<String, ASNModule>();
 
     private ASNMib m_mib;
 
@@ -53,6 +50,10 @@ public class FileParserPhase implements Phase {
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e); // TODO
         }
+    }
+
+    public FileParserProblemReporter getFileParserProblemReporter() {
+        return m_pr;
     }
 
     public Object process(Object input) throws PhaseException {
