@@ -21,6 +21,7 @@ import org.jsmiparser.parsetree.asn1.ASNModule;
 import org.jsmiparser.phase.PhaseException;
 import org.jsmiparser.phase.file.AbstractFileParser;
 import org.jsmiparser.phase.file.FileParserPhase;
+import org.jsmiparser.phase.file.SkipStandardException;
 
 import java.io.*;
 
@@ -32,16 +33,20 @@ public class AntlrFileParser extends AbstractFileParser {
 
     public ASNModule parse() {
         assert(m_state == State.UNPARSED);
+
+        InputStream is = null;
         try {
             m_state = State.PARSING;
-            InputStream is = new BufferedInputStream(new FileInputStream(m_file));
+            is = new BufferedInputStream(new FileInputStream(m_file));
             SMILexer lexer = new SMILexer(is);
             SMIParser parser = new SMIParser(lexer);
-            parser.init(m_file.getPath(), this);
-            
-            m_module = parser.module_definition();
-            is.close();
+            // TODO parser.init(m_file.getPath(), this);
 
+            // TODO m_module =
+            parser.module_definition();
+            return m_module;
+        } catch (SkipStandardException e) {
+            // do nothing
             return m_module;
         } catch (FileNotFoundException e) {
             throw new PhaseException(e);
@@ -53,9 +58,15 @@ public class AntlrFileParser extends AbstractFileParser {
             throw new PhaseException(e);
         } finally {
             m_state = State.PARSED;
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    throw new PhaseException(e);
+                }
+            }
         }
     }
-
 
 
 }
