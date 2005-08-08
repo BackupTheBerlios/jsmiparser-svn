@@ -89,6 +89,7 @@ public class SmiDefaultParserTest extends TestCase {
                 File file = files[i];
 
                 if (file.isFile()
+                        && !file.getName().endsWith("tree")
                         && !file.getName().startsWith("Makefile")
                         && !file.getName().endsWith("~")) {
                         //&& !file.getName().endsWith("-orig")) { // TODO parsing -orig should give more errors!

@@ -181,6 +181,25 @@ WS
 }
 ;
 
+BUG
+:
+	"SMI TRAP-TYPE"
+{
+	$setType(Token.SKIP);
+}
+;
+
+INCLUDE
+:
+	"#include"
+	(~('-'|'\n'|'\r'))*
+	(('\r')? '\n') { newline(); }
+{
+	$setType(Token.SKIP);
+}
+;
+
+/*
 // Single-line comments
 SL_COMMENT
 :
@@ -194,6 +213,21 @@ SL_COMMENT
 	$setType(Token.SKIP);
 }
 ;
+*/
+
+SL_COMMENT
+:
+(options {warnWhenFollowAmbig=false;} 
+:
+	COMMENT
+	( ~('\n'|'\r'))*
+	( (('\r')? '\n') { newline(); })
+)
+{
+	$setType(Token.SKIP);
+}
+;
+
 
 NUMBER	:	('0'..'9')+ ;
 
@@ -246,6 +280,7 @@ C_STRING 	: 	'"' (options {greedy=false;}
                         '"' ;
 
 
+
 //*************************************************************************
 //**********		PARSER DEFINITIONS
 //*************************************************************************
@@ -261,6 +296,7 @@ options	{
 
 module_definition
 :
+	EOF |
 	module_identifier DEFINITIONS_KW ASSIGN_OP
 	BEGIN_KW
 		module_body
@@ -277,10 +313,15 @@ module_identifier
 
 module_body
 :
+	(exports)?
 	(imports)?
 	(assignment)*
 ;
 
+exports
+:
+	EXPORTS_KW (symbol_list) SEMI
+;
 
 imports
 :
@@ -475,6 +516,7 @@ leaf_value
 	| oid_value
 	| octet_string_value
 	| defined_value
+	| NULL_KW
 ;
 
 
