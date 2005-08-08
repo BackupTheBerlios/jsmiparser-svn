@@ -183,10 +183,17 @@ WS
 
 // Single-line comments
 SL_COMMENT
-	: (options {warnWhenFollowAmbig=false;} 
-	: COMMENT (  { LA(2)!='-' }? '-' 	|	~('-'|'\n'|'\r'))*	( (('\r')? '\n') { newline(); }| COMMENT) )
-		{$setType(Token.SKIP);  }
-	;
+:
+(options {warnWhenFollowAmbig=false;} 
+:
+	COMMENT
+	(  { LA(2)!='-' }? '-' 	|	~('-'|'\n'|'\r'))*
+	( (('\r')? '\n') { newline(); }| COMMENT)
+)
+{
+	$setType(Token.SKIP);
+}
+;
 
 NUMBER	:	('0'..'9')+ ;
 

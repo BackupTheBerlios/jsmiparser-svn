@@ -22,10 +22,13 @@ import org.jsmiparser.phase.PhaseException;
 import org.jsmiparser.phase.file.AbstractFileParser;
 import org.jsmiparser.phase.file.FileParserPhase;
 import org.jsmiparser.phase.file.SkipStandardException;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 
 public class AntlrFileParser extends AbstractFileParser {
+
+    private static final Logger m_log = Logger.getLogger(AntlrFileParser.class);
 
     public AntlrFileParser(FileParserPhase fileParserPhase, File file) {
         super(fileParserPhase, file);
@@ -37,6 +40,7 @@ public class AntlrFileParser extends AbstractFileParser {
         InputStream is = null;
         try {
             m_state = State.PARSING;
+            m_log.debug("Parsing :" + m_file);
             is = new BufferedInputStream(new FileInputStream(m_file));
             SMILexer lexer = new SMILexer(is);
             SMIParser parser = new SMIParser(lexer);
@@ -49,12 +53,16 @@ public class AntlrFileParser extends AbstractFileParser {
             // do nothing
             return m_module;
         } catch (FileNotFoundException e) {
+            m_log.error(e.getClass().getSimpleName(), e);
             throw new PhaseException(e);
         } catch (RecognitionException e) {
+            m_log.error(e.getClass().getSimpleName(), e);
             throw new PhaseException(e);
         } catch (TokenStreamException e) {
+            m_log.error(e.getClass().getSimpleName(), e);
             throw new PhaseException(e);
         } catch (IOException e) {
+            m_log.error(e.getClass().getSimpleName(), e);
             throw new PhaseException(e);
         } finally {
             m_state = State.PARSED;
