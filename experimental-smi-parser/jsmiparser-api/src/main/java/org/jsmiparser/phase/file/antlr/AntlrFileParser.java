@@ -16,15 +16,20 @@
 package org.jsmiparser.phase.file.antlr;
 
 import antlr.RecognitionException;
+import antlr.Token;
 import antlr.TokenStreamException;
+import org.apache.log4j.Logger;
 import org.jsmiparser.parsetree.asn1.ASNModule;
 import org.jsmiparser.phase.PhaseException;
 import org.jsmiparser.phase.file.AbstractFileParser;
 import org.jsmiparser.phase.file.FileParserPhase;
 import org.jsmiparser.phase.file.SkipStandardException;
-import org.apache.log4j.Logger;
+import org.jsmiparser.util.location.Location;
+import org.jsmiparser.util.token.IdToken;
 
 import java.io.*;
+import java.util.List;
+import java.util.ArrayList;
 
 public class AntlrFileParser extends AbstractFileParser {
 
@@ -44,7 +49,7 @@ public class AntlrFileParser extends AbstractFileParser {
             is = new BufferedInputStream(new FileInputStream(m_file));
             SMILexer lexer = new SMILexer(is);
             SMIParser parser = new SMIParser(lexer);
-            // TODO parser.init(m_file.getPath(), this);
+            parser.init(this);
 
             // TODO m_module =
             parser.module_definition();
@@ -77,4 +82,28 @@ public class AntlrFileParser extends AbstractFileParser {
     }
 
 
+    private Location makeLocation(Token token) {
+        return new Location(m_file != null ? m_file.getPath() : "unknown", token.getLine(), token.getColumn());
+    }
+
+    public IdToken idt(Token idToken) {
+        return new IdToken(makeLocation(idToken), idToken.getText());
+    }
+
+    public IdToken idt(Token... tokens) {
+        for (Token token : tokens) {
+            if (token != null) {
+                return idt(token);
+            }
+        }
+        return null;
+    }
+
+    public List<IdToken> makeIdTokenList() {
+        return new ArrayList<IdToken>();
+    }
+
+    public void addImports(IdToken moduleToken, List<IdToken> importedTokenList) {
+        //TODO m_module.addImports(moduleToken, importedTokenList);
+    }
 }

@@ -19,6 +19,7 @@
 header {
 package org.jsmiparser.phase.file.antlr;
 
+import org.jsmiparser.util.token.*;
 import org.jsmiparser.smi.*;
 import org.jsmiparser.phase.file.*;
 
@@ -293,6 +294,14 @@ options	{
         defaultErrorHandler=false;
 }
 
+{
+	private AntlrFileParser m_fp;
+
+	public void init(AntlrFileParser fp) {
+		m_fp = fp;
+	}
+}
+
 
 module_definition
 :
@@ -329,35 +338,53 @@ imports
 ;
 
 symbols_from_module
+{
+	List<IdToken> idTokenList = null;
+	IdToken m = null;
+}
 :
-	symbol_list FROM_KW UPPER 
+	idTokenList=symbol_list FROM_KW m=upper
+{
+	m_fp.addImports(m, idTokenList);
+} 
 ;
 
-symbol_list
+symbol_list returns [List<IdToken> result = m_fp.makeIdTokenList()]
+{
+	IdToken s1 = null, s2 = null;
+}
 :
-	symbol (COMMA symbol)*
+	s1=symbol		{ result.add(s1); }
+	(COMMA s2=symbol	{ result.add(s2); } )*
 ;
 
-symbol
+symbol returns [IdToken result = null]
 :
-	UPPER
-	| integer_type_kw
-	| LOWER
-	| macroName
+	result=upper
+	| result=integer_type_id
+	| result=lower
+	| result=macroName
 ;
 
-macroName
+
+
+macroName returns [IdToken result = null]
 :
-	"OBJECT-TYPE"
-	| "MODULE-IDENTITY"
-	| "OBJECT-IDENTITY"
-	| "NOTIFICATION-TYPE" 
-        | "TEXTUAL-CONVENTION"
-	| "OBJECT-GROUP"
-	| "NOTIFICATION-GROUP"
-	| "MODULE-COMPLIANCE" 
-	| "AGENT-CAPABILITIES"
-	| "TRAP-TYPE"
+(
+	ot:"OBJECT-TYPE"
+	| mi:"MODULE-IDENTITY"
+	| oi:"OBJECT-IDENTITY"
+	| nt:"NOTIFICATION-TYPE" 
+        | tc:"TEXTUAL-CONVENTION"
+	| og:"OBJECT-GROUP"
+	| ng:"NOTIFICATION-GROUP"
+	| mc:"MODULE-COMPLIANCE" 
+	| ac:"AGENT-CAPABILITIES"
+	| tt:"TRAP-TYPE"
+)
+{
+	result = m_fp.idt(ot, mi, oi, nt, tc, og, ng, mc, ac, tt);
+}
 ;
 
 
@@ -400,6 +427,22 @@ integer_type_kw
 	| "Gauge32"
 	| "Counter64"
 	| "TimeTicks"
+;
+
+integer_type_id returns [IdToken result = null]
+:
+(
+	  i32 : "Integer32"
+	| c   : "Counter"
+	| c32 : "Counter32"
+	| g   : "Gauge"
+	| g32 : "Gauge32"
+	| c64 : "Counter64"
+	| tt  : "TimeTicks"
+)
+{
+	result = m_fp.idt(i32, c, c32, g, g32, c64, tt);
+}
 ;
 
 oid_type
@@ -814,4 +857,20 @@ named_number
 signed_number
 :
 	(MINUS)? NUMBER
+;
+
+upper returns [IdToken result = null]
+:
+	u:UPPER
+{
+	result = m_fp.idt(u);
+}
+;
+
+lower returns [IdToken result = null]
+:
+	l:LOWER
+{
+	result = m_fp.idt(l);
+}
 ;

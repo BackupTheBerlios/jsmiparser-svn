@@ -49,7 +49,7 @@ public class IFParseTest extends TestCase {
         FileParserPhase fileParserPhase = new FileParserPhase(new DefaultProblemReporterFactory(new DefaultProblemEventHandler()),
                 AntlrFileParser.class);
         AntlrFileParser fileParser = new AntlrFileParser(fileParserPhase, null);
-        // TODO parser.init("/IF-MIB", fileParser);
+        parser.init(fileParser);
 
         //ASNModule module =
         parser.module_definition();
