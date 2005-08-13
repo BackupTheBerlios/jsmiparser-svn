@@ -15,22 +15,13 @@
  */
 package org.jsmiparser.phase.file.antlr;
 
-import antlr.*;
-import org.jsmiparser.parsetree.asn1.*;
-import org.jsmiparser.parsetree.smi.PIBAccess;
-import org.jsmiparser.parsetree.smi.SMIAccess;
-import org.jsmiparser.parsetree.smi.SMINamedBit;
-import org.jsmiparser.parsetree.smi.SMIStatus;
-import org.jsmiparser.util.location.Location;
+import antlr.LLkParser;
+import antlr.ParserSharedInputState;
+import antlr.TokenBuffer;
+import antlr.TokenStream;
+import org.jsmiparser.parsetree.asn1.ASNModule;
+import org.jsmiparser.parsetree.asn1.Context;
 import org.jsmiparser.util.location.LocationFactory;
-import org.jsmiparser.util.token.IdToken;
-import org.jsmiparser.util.token.EnumToken;
-import org.jsmiparser.util.token.StringToken;
-import org.jsmiparser.util.token.BigIntegerToken;
-import org.jsmiparser.phase.file.FileParser;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author davy
@@ -61,6 +52,7 @@ public abstract class SMIAbstractParser extends LLkParser implements Context {
         super(tokenStream, k);
     }
 
+    /*
     public void init(String source, AntlrFileParser fileParser) {
         m_source = source;
         m_locationFactory = new AntlrLocationFactory(this, source);
@@ -276,4 +268,5 @@ public abstract class SMIAbstractParser extends LLkParser implements Context {
     protected ASNLiteralValue makeIntegerLiteralValue(Token minusToken, Token intToken) {
         return new ASNLiteralValue(m_module, it(minusToken, intToken));
     }
+    */
 }

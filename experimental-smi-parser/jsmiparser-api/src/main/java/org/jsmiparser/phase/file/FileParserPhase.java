@@ -15,10 +15,11 @@
  */
 package org.jsmiparser.phase.file;
 
-import org.jsmiparser.parsetree.asn1.ASNMib;
 import org.jsmiparser.parsetree.asn1.Context;
 import org.jsmiparser.phase.Phase;
 import org.jsmiparser.phase.PhaseException;
+import org.jsmiparser.smi.SmiMib;
+import org.jsmiparser.smi.SmiJavaCodeNamingStrategy;
 import org.jsmiparser.util.problem.ProblemReporterFactory;
 import org.jsmiparser.util.token.IdToken;
 
@@ -40,7 +41,7 @@ public class FileParserPhase implements Phase {
     private FileParserOptions m_options = new FileParserOptions();
     private Map<File, FileParser> m_fileParserMap = new LinkedHashMap<File, FileParser>();
 
-    private ASNMib m_mib;
+    private SmiMib m_mib;
 
     public FileParserPhase(ProblemReporterFactory prf, Class<? extends FileParser> fileParserClass) {
         super();
@@ -58,7 +59,7 @@ public class FileParserPhase implements Phase {
 
     public Object process(Object input) throws PhaseException {
         initFileParserMap();
-        m_mib = new ASNMib();
+
 
         for (FileParser fileParser : m_fileParserMap.values()) {
             if (fileParser.getState() == FileParser.State.UNPARSED) {
@@ -66,7 +67,7 @@ public class FileParserPhase implements Phase {
             }
         }
 
-        m_mib.processModules();
+        //m_mib.processModules();
 
         return m_mib;
     }
@@ -125,7 +126,10 @@ public class FileParserPhase implements Phase {
         return m_options;
     }
 
-    public ASNMib getMib() {
+    public SmiMib getMib() {
+        if (m_mib == null) {
+            m_mib = new SmiMib(new SmiJavaCodeNamingStrategy("org.jsmiparser.mib")); // TODO
+        }
         return m_mib;
     }
 }

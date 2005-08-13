@@ -16,10 +16,11 @@
 package org.jsmiparser.phase.file;
 
 import org.apache.log4j.Logger;
-import org.jsmiparser.parsetree.asn1.ASNAssignment;
-import org.jsmiparser.parsetree.asn1.ASNImports;
 import org.jsmiparser.parsetree.asn1.ASNModule;
 import org.jsmiparser.util.token.IdToken;
+import org.jsmiparser.smi.SmiSymbol;
+import org.jsmiparser.smi.SmiModule;
+import org.jsmiparser.smi.SmiImports;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -27,23 +28,23 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ASNSymbolMap<Assignment extends ASNAssignment> {
-    private static final Logger m_log = Logger.getLogger(ASNSymbolMap.class);
+public class SmiSymbolMap<Symbol extends SmiSymbol> {
+    private static final Logger m_log = Logger.getLogger(SmiSymbolMap.class);
 
-    private ASNModule m_module;
+    private SmiModule m_module;
 
     // TODO use a multimap that also stores the duplicates?
     // unresolved elements are in here as well, with an empty value
-    private Map<String, Assignment> m_map = new HashMap<String, Assignment>();
+    private Map<String, Symbol> m_map = new HashMap<String, Symbol>();
 
-    private Constructor<Assignment> m_constructor;
-    private Class<Assignment> m_assigmentClass;
+    private Constructor<Symbol> m_constructor;
+    private Class<Symbol> m_symbolClass;
     private FileParserProblemReporter m_pr;
 
-    public ASNSymbolMap(FileParserProblemReporter fileParserProblemReporter, ASNModule module, Class<Assignment> assignmentClass) {
+    public SmiSymbolMap(FileParserProblemReporter fileParserProblemReporter, SmiModule module, Class<Symbol> assignmentClass) {
         m_module = module;
         m_pr = fileParserProblemReporter;
-        m_assigmentClass = assignmentClass;
+        m_symbolClass = assignmentClass;
         try {
             m_constructor = assignmentClass.getConstructor(ASNModule.class, IdToken.class);
         } catch (NoSuchMethodException e) {
@@ -53,19 +54,19 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
 
 
     // TODO should this return unresolved symbols as well?
-    public Assignment find(String id) {
+    public Symbol find(String id) {
         return m_map.get(id);
     }
 
     /**
      * This is to be used when resolving symbols within this module.
      */
-    public Assignment resolve(IdToken id) {
+    public Symbol resolve(IdToken id) {
         // TODO: this doesn't work because the Context always assigns the module that is currently parsed.
         // assert(id.getLocation().getSource() == m_module.getLocation().getSource());
         // TODO
 
-        Assignment result = m_map.get(id.getId());
+        Symbol result = m_map.get(id.getId());
 
         if (result == null) {
             result = findImport(id);
@@ -81,11 +82,11 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
         return result;
     }
 
-    private Assignment findImport(IdToken idToken) {
-        for (ASNImports imports : m_module.getImports()) {
-            for (ASNAssignment assignment : imports.getSymbols()) {
-                if (assignment.getName().equals(idToken.getId()) && m_assigmentClass.isInstance(assignment)) {
-                    return m_assigmentClass.cast(assignment);
+    private Symbol findImport(IdToken idToken) {
+        for (SmiImports imports : m_module.getImports()) {
+            for (SmiSymbol symbol : imports.getSymbols()) {
+                if (symbol.getId().equals(idToken.getId()) && m_symbolClass.isInstance(symbol)) {
+                    return m_symbolClass.cast(symbol);
                 }
             }
         }
@@ -95,10 +96,10 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
     /**
      * Other module use a symbol (supposedly) defined in this module.
      */
-    public Assignment use(IdToken idToken) {
+    public Symbol use(IdToken idToken) {
         //assert(!idToken.getLocation().getSource().equals(m_module.getLocation().getSource()));
 
-        Assignment result = m_map.get(idToken.getId());
+        Symbol result = m_map.get(idToken.getId());
         if (result == null) {
             result = newInstance(idToken);
             m_map.put(idToken.getId(), result);
@@ -110,7 +111,7 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
     }
 
 
-    private Assignment newInstance(IdToken idToken) {
+    private Symbol newInstance(IdToken idToken) {
         try {
             return m_constructor.newInstance(m_module, idToken);
         } catch (InstantiationException e) {
@@ -124,18 +125,19 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
         }
     }
 
-    public Assignment create(IdToken idToken) {
-        Assignment result = m_map.get(idToken.getId());
+    public Symbol create(IdToken idToken) {
+        Symbol result = m_map.get(idToken.getId());
         if (result == null) {
             // plain and simple case: the symbol wasn't there, and was never referenced either.
             result = newInstance(idToken);
             m_map.put(idToken.getId(), result);
         } else {
             if (result.getModule() != m_module) {
-                m_log.warn("created symbol " + idToken.getId() + " in " + m_module.getName() + " is part of " + result.getModule().getName());
+                m_log.warn("created symbol " + idToken.getId() + " in " + m_module.getId() + " is part of " + result.getModule().getId());
             }
-            if (result.getRightHandSide() != null) { // It is effectively resolved
-                Assignment n = newInstance(idToken); // return dummy new instance
+            // TODO URGENT if (result.getRightHandSide() != null) { // It is effectively resolved
+            if (false) {
+                Symbol n = newInstance(idToken); // return dummy new instance
                 m_pr.reportDuplicateAssignment(n, result);
                 result = n;
                 // TODO register duplicate in multimap?
@@ -151,7 +153,7 @@ public class ASNSymbolMap<Assignment extends ASNAssignment> {
         return result;
     }
 
-    public Collection<Assignment> getAll() {
+    public Collection<Symbol> getAll() {
         return m_map.values();
     }
 

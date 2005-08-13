@@ -303,20 +303,21 @@ options	{
 }
 
 
-module_definition
+module_definition returns [SmiModule result = null]
 :
 	EOF |
-	module_identifier DEFINITIONS_KW ASSIGN_OP
+	result=module_identifier DEFINITIONS_KW ASSIGN_OP
 	BEGIN_KW
 		module_body
 	END_KW
 ;
 
-module_identifier
+module_identifier returns [SmiModule result = null]
 :
 	u:UPPER
 {
 	SkipStandardException.skip(u.getText());
+	result = m_fp.makeModule(u);
 }
 ;
 

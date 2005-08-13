@@ -19,7 +19,7 @@ import org.jsmiparser.util.token.IdToken;
 
 import java.math.BigInteger;
 
-public abstract class SmiAttribute extends SmiSymbol {
+public abstract class SmiAttribute extends SmiValue {
 	
 	private SmiType type_;
 	private String oid_;

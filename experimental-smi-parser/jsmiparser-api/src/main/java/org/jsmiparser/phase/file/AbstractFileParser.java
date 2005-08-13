@@ -17,6 +17,7 @@ package org.jsmiparser.phase.file;
 
 import org.jsmiparser.parsetree.asn1.*;
 import org.jsmiparser.util.token.IdToken;
+import org.jsmiparser.smi.*;
 
 import java.io.File;
 
@@ -25,11 +26,11 @@ public abstract class AbstractFileParser implements FileParser {
     protected FileParserPhase m_fileParserPhase;
     protected File m_file;
     protected State m_state = State.UNPARSED;
-    protected ASNModule m_module;
+    protected SmiModule m_module;
 
-    private ASNSymbolMap<ASNTypeAssignment> m_typeMap;
-    private ASNSymbolMap<ASNValueAssignment> m_valueMap;
-    private ASNSymbolMap<ASNMacroDefinition> m_macroMap;
+    private SmiSymbolMap<SmiType> m_typeMap;
+    private SmiSymbolMap<SmiValue> m_valueMap;
+    private SmiSymbolMap<SmiMacro> m_macroMap;
 
     protected AbstractFileParser(FileParserPhase fileParserPhase, File file) {
         m_fileParserPhase = fileParserPhase;
@@ -38,9 +39,9 @@ public abstract class AbstractFileParser implements FileParser {
 
     private void init() {
         assert(m_module != null);
-        m_typeMap = new ASNSymbolMap<ASNTypeAssignment>(m_fileParserPhase.getFileParserProblemReporter(), m_module, ASNTypeAssignment.class);
-        m_valueMap = new ASNSymbolMap<ASNValueAssignment>(m_fileParserPhase.getFileParserProblemReporter(), m_module, ASNValueAssignment.class);
-        m_macroMap = new ASNSymbolMap<ASNMacroDefinition>(m_fileParserPhase.getFileParserProblemReporter(), m_module, ASNMacroDefinition.class);
+        m_typeMap = new SmiSymbolMap<SmiType>(m_fileParserPhase.getFileParserProblemReporter(), m_module, SmiType.class);
+        m_valueMap = new SmiSymbolMap<SmiValue>(m_fileParserPhase.getFileParserProblemReporter(), m_module, SmiValue.class);
+        m_macroMap = new SmiSymbolMap<SmiMacro>(m_fileParserPhase.getFileParserProblemReporter(), m_module, SmiMacro.class);
     }
 
     public FileParserPhase getFileParserPhase() {
@@ -55,24 +56,24 @@ public abstract class AbstractFileParser implements FileParser {
         return m_state;
     }
 
-    public ASNModule getModule() {
+    public SmiModule getModule() {
         return m_module;
     }
 
-    public ASNSymbolMap<ASNTypeAssignment> getTypeMap() {
+    public SmiSymbolMap<SmiType> getTypeMap() {
         return m_typeMap;
     }
 
-    public ASNSymbolMap<ASNValueAssignment> getValueMap() {
+    public SmiSymbolMap<SmiValue> getValueMap() {
         return m_valueMap;
     }
 
-    public ASNSymbolMap<ASNMacroDefinition> getMacroMap() {
+    public SmiSymbolMap<SmiMacro> getMacroMap() {
         return m_macroMap;
     }
 
-    public ASNAssignment create(IdToken idToken) {
-        ASNAssignment result = null;
+    public SmiSymbol create(IdToken idToken) {
+        SmiSymbol result = null;
         switch (ASNAssignment.determineType(idToken)) {
             case MACRODEF:
                 result = m_macroMap.create(idToken);
@@ -87,8 +88,8 @@ public abstract class AbstractFileParser implements FileParser {
         return result;
     }
 
-    public ASNAssignment use(IdToken idToken) {
-        ASNAssignment result = null;
+    public SmiSymbol use(IdToken idToken) {
+        SmiSymbol result = null;
         switch (ASNAssignment.determineType(idToken)) {
             case MACRODEF:
                 result = m_macroMap.use(idToken);
@@ -103,17 +104,17 @@ public abstract class AbstractFileParser implements FileParser {
         return result;
     }
 
-    public ASNModule useModule(IdToken idToken) {
+    public SmiModule useModule(IdToken idToken) {
         if (m_module == null) {
-            m_module = new ASNModule(m_fileParserPhase.getMib(), idToken);
+            m_module = new SmiModule(m_fileParserPhase.getMib(), idToken);
             init();
         }
         return m_module;
     }
 
-    public ASNModule createModule(IdToken idToken) {
+    public SmiModule createModule(IdToken idToken) {
         if (m_module == null) {
-            m_module = new ASNModule(m_fileParserPhase.getMib(), idToken);
+            m_module = new SmiModule(m_fileParserPhase.getMib(), idToken);
             init();
         }
         return m_module;

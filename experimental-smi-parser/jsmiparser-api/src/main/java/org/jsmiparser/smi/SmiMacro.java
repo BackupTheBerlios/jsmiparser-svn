@@ -13,38 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jsmiparser.phase.file;
+package org.jsmiparser.smi;
 
-import org.jsmiparser.parsetree.asn1.*;
 import org.jsmiparser.util.token.IdToken;
-import org.jsmiparser.smi.*;
 
-import java.io.File;
+public class SmiMacro extends SmiValue {
 
-public interface FileParser {
-
-    enum State {
-        UNPARSED,
-        PARSING,
-        PARSED
+    public SmiMacro(IdToken idToken, SmiModule module) {
+        super(idToken, module);
     }
-
-    SmiModule parse();
-
-    File getFile();
-
-    State getState();
-
-    SmiModule getModule();
-
-    SmiSymbolMap<SmiType> getTypeMap();
-
-    SmiSymbolMap<SmiValue> getValueMap();
-
-    SmiSymbolMap<SmiMacro> getMacroMap();
-
-    SmiSymbol use(IdToken idToken);
-
-    SmiModule useModule(IdToken idToken);
-
 }

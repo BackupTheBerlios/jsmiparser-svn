@@ -19,13 +19,13 @@ import antlr.RecognitionException;
 import antlr.Token;
 import antlr.TokenStreamException;
 import org.apache.log4j.Logger;
-import org.jsmiparser.parsetree.asn1.ASNModule;
 import org.jsmiparser.phase.PhaseException;
 import org.jsmiparser.phase.file.AbstractFileParser;
 import org.jsmiparser.phase.file.FileParserPhase;
 import org.jsmiparser.phase.file.SkipStandardException;
 import org.jsmiparser.util.location.Location;
 import org.jsmiparser.util.token.IdToken;
+import org.jsmiparser.smi.SmiModule;
 
 import java.io.*;
 import java.util.List;
@@ -39,7 +39,7 @@ public class AntlrFileParser extends AbstractFileParser {
         super(fileParserPhase, file);
     }
 
-    public ASNModule parse() {
+    public SmiModule parse() {
         assert(m_state == State.UNPARSED);
 
         InputStream is = null;
@@ -51,8 +51,7 @@ public class AntlrFileParser extends AbstractFileParser {
             SMIParser parser = new SMIParser(lexer);
             parser.init(this);
 
-            // TODO m_module =
-            parser.module_definition();
+            m_module = parser.module_definition();
             return m_module;
         } catch (SkipStandardException e) {
             // do nothing
@@ -104,6 +103,11 @@ public class AntlrFileParser extends AbstractFileParser {
     }
 
     public void addImports(IdToken moduleToken, List<IdToken> importedTokenList) {
-        //TODO m_module.addImports(moduleToken, importedTokenList);
+        // TODO m_module.addImports(moduleToken, importedTokenList);
+    }
+
+    public SmiModule makeModule(Token idToken) {
+        m_module = new SmiModule(m_fileParserPhase.getMib(), idt(idToken));
+        return m_module;
     }
 }

@@ -20,7 +20,7 @@ import org.jsmiparser.util.token.IdToken;
 import java.util.List;
 import java.util.Set;
 
-public abstract class SmiClass extends SmiSymbol {
+public abstract class SmiClass extends SmiValue {
 
 	public SmiClass(IdToken idToken, SmiModule module) {
 		super(idToken, module);

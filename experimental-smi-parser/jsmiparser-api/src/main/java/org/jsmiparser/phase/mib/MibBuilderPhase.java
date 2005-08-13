@@ -29,6 +29,7 @@ import org.jsmiparser.parsetree.smi.SMIType;
 
 import java.math.BigInteger;
 
+// TODO remove?
 public class MibBuilderPhase extends AbstractPhase {
     private static final Logger m_log = Logger.getLogger(MibBuilderPhase.class);
 

@@ -15,17 +15,18 @@
  */
 package org.jsmiparser.smi;
 
-import org.apache.log4j.Logger;
 import org.jsmiparser.util.token.IdToken;
 
-public class SmiModule extends SmiSymbolContainer {
+import java.util.ArrayList;
+import java.util.List;
 
-    private static final Logger log = Logger.getLogger(SmiModule.class);
+public class SmiModule extends SmiSymbolContainer {
 
     private SmiMib mib_;
     private IdToken m_idToken;
 
     private SmiScalarsClass scalarsClass_;
+    private List<SmiImports> m_imports = new ArrayList<SmiImports>();
 
     public SmiModule(SmiMib mib, IdToken idToken) {
         super(mib);
@@ -155,4 +156,7 @@ public class SmiModule extends SmiSymbolContainer {
     }
 
 
+    public List<SmiImports> getImports() {
+        return m_imports;
+    }
 }
