@@ -92,7 +92,7 @@ public class SmiDefaultParserTest extends TestCase {
                 File file = files[i];
 
                 if (file.isFile()
-                        && !file.getName().startsWith("TOTAL")
+                        && !file.getName().contains("TOTAL")
                         && !file.getName().endsWith("tree")
                         && !file.getName().startsWith("Makefile")
                         && !file.getName().endsWith("~")) {
