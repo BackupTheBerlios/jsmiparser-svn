@@ -23,9 +23,12 @@ import org.jsmiparser.phase.PhaseException;
 import org.jsmiparser.phase.file.AbstractFileParser;
 import org.jsmiparser.phase.file.FileParserPhase;
 import org.jsmiparser.phase.file.SkipStandardException;
+import org.jsmiparser.phase.file.FileParser;
 import org.jsmiparser.util.location.Location;
 import org.jsmiparser.util.token.IdToken;
 import org.jsmiparser.smi.SmiModule;
+import org.jsmiparser.smi.SmiImports;
+import org.jsmiparser.smi.SmiSymbol;
 
 import java.io.*;
 import java.util.List;
@@ -104,10 +107,22 @@ public class AntlrFileParser extends AbstractFileParser {
 
     public void addImports(IdToken moduleToken, List<IdToken> importedTokenList) {
         // TODO m_module.addImports(moduleToken, importedTokenList);
+
+        // TODO check module imported twice
+
+        FileParser importedFileParser = getFileParserPhase().use(moduleToken);
+        SmiImports result = new SmiImports(m_module, moduleToken, importedFileParser.getModule());
+        for (IdToken idToken : importedTokenList) {
+            SmiSymbol symbol = importedFileParser.use(idToken);
+
+            // TODO check duplicate
+            result.addSymbol(idToken, symbol);
+        }
+
+
     }
 
     public SmiModule makeModule(Token idToken) {
-        m_module = new SmiModule(m_fileParserPhase.getMib(), idt(idToken));
-        return m_module;
+        return createModule(idt(idToken));
     }
 }

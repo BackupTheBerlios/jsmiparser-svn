@@ -15,22 +15,26 @@
  */
 package org.jsmiparser.smi;
 
-import org.apache.log4j.Logger;
+import org.jsmiparser.util.data.LinkedHashMapKeyList;
+import org.jsmiparser.util.location.Location;
+import org.jsmiparser.util.token.IdToken;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.ArrayList;
 
 // TODO idtokens
 public class SmiImports {
 
     private SmiModule m_importingModule;
+    private IdToken m_importedModuleToken;
     private SmiModule m_importedModule;
-    private List<SmiSymbol> m_symbols = new ArrayList<SmiSymbol>();
+    private LinkedHashMap<SmiSymbol, IdToken> m_symbolMap = new LinkedHashMap<SmiSymbol,  IdToken>();
+    private List<SmiSymbol> m_symbols = new LinkedHashMapKeyList<SmiSymbol, IdToken>(m_symbolMap);
 
-    public SmiImports(SmiModule importingModule, SmiModule importedModule, List<SmiSymbol> symbols) {
+    public SmiImports(SmiModule importingModule, IdToken importedModuleToken, SmiModule importedModule) {
         m_importingModule = importingModule;
+        m_importedModuleToken = importedModuleToken;
         m_importedModule = importedModule;
-        m_symbols = symbols;
     }
 
     public SmiModule getImportingModule() {
@@ -43,5 +47,26 @@ public class SmiImports {
 
     public List<SmiSymbol> getSymbols() {
         return m_symbols;
+    }
+
+    public IdToken getImportedModuleToken() {
+        return m_importedModuleToken;
+    }
+
+    public Location getLocation() {
+        return m_importedModuleToken.getLocation();
+    }
+
+    public void addSymbol(IdToken idToken, SmiSymbol symbol) {
+        m_symbolMap.put(symbol, idToken);
+    }
+
+    public SmiSymbol find(String id) {
+        for (SmiSymbol symbol : m_symbolMap.keySet()) {
+            if (symbol.getId().equals(id)) {
+                return symbol;
+            }
+        }
+        return null;
     }
 }

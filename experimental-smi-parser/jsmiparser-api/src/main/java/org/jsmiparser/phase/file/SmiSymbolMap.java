@@ -16,11 +16,10 @@
 package org.jsmiparser.phase.file;
 
 import org.apache.log4j.Logger;
-import org.jsmiparser.parsetree.asn1.ASNModule;
-import org.jsmiparser.util.token.IdToken;
-import org.jsmiparser.smi.SmiSymbol;
-import org.jsmiparser.smi.SmiModule;
 import org.jsmiparser.smi.SmiImports;
+import org.jsmiparser.smi.SmiModule;
+import org.jsmiparser.smi.SmiSymbol;
+import org.jsmiparser.util.token.IdToken;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -46,7 +45,7 @@ public class SmiSymbolMap<Symbol extends SmiSymbol> {
         m_pr = fileParserProblemReporter;
         m_symbolClass = assignmentClass;
         try {
-            m_constructor = assignmentClass.getConstructor(ASNModule.class, IdToken.class);
+            m_constructor = assignmentClass.getConstructor(IdToken.class, SmiModule.class);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
@@ -113,7 +112,7 @@ public class SmiSymbolMap<Symbol extends SmiSymbol> {
 
     private Symbol newInstance(IdToken idToken) {
         try {
-            return m_constructor.newInstance(m_module, idToken);
+            return m_constructor.newInstance(idToken, m_module);
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {

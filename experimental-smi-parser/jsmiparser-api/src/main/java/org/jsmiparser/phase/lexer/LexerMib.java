@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jsmiparser.smi;
+package org.jsmiparser.phase.lexer;
 
-import org.jsmiparser.util.token.IdToken;
+import org.apache.log4j.Logger;
 
-public class SmiMacro extends SmiSymbol {
-
-    public SmiMacro(IdToken idToken, SmiModule module) {
-        super(idToken, module);
-    }
+public class LexerMib {
+    private static final Logger m_log = Logger.getLogger(LexerMib.class);
 }

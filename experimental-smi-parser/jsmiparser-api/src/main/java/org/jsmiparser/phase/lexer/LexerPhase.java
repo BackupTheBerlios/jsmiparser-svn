@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jsmiparser.smi;
+package org.jsmiparser.phase.lexer;
 
-import org.jsmiparser.util.token.IdToken;
+import org.jsmiparser.phase.Phase;
+import org.jsmiparser.phase.PhaseException;
 
-public class SmiMacro extends SmiSymbol {
+public class LexerPhase implements Phase {
 
-    public SmiMacro(IdToken idToken, SmiModule module) {
-        super(idToken, module);
+    public Object getOptions() {
+        return null;  // TODO
+    }
+
+    public LexerMib process(Object input) throws PhaseException {
+        return null;  // TODO
     }
 }

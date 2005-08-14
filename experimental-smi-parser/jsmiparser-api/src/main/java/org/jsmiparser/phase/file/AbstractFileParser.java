@@ -18,10 +18,13 @@ package org.jsmiparser.phase.file;
 import org.jsmiparser.parsetree.asn1.*;
 import org.jsmiparser.util.token.IdToken;
 import org.jsmiparser.smi.*;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 
 public abstract class AbstractFileParser implements FileParser {
+
+    private static final Logger m_log = Logger.getLogger(AbstractFileParser.class);
 
     protected FileParserPhase m_fileParserPhase;
     protected File m_file;
@@ -89,6 +92,7 @@ public abstract class AbstractFileParser implements FileParser {
     }
 
     public SmiSymbol use(IdToken idToken) {
+        //m_log.debug(idToken + " used from " + m_module.getIdToken());
         SmiSymbol result = null;
         switch (ASNAssignment.determineType(idToken)) {
             case MACRODEF:

@@ -26,13 +26,24 @@ import java.io.File;
 
 public class SmiDefaultParserTest extends TestCase {
 
-    public void testParser() throws PhaseException {
+    public void test() {
+
+        String mibsVar = System.getenv("MIBS");
+        assertNotNull(mibsVar);
+        String[] mibsDirs = mibsVar.split(":");
+        for (String mibDirs : mibsDirs) {
+            doTestParser(mibDirs);
+        }
+
+    }
+
+    private void doTestParser(String mibDirs) throws PhaseException {
 
         ProblemEventHandler problemEventHandler = new DefaultProblemEventHandler();
         SmiDefaultParser parser = new SmiDefaultParser(problemEventHandler);
         parser.init();
         FileParserOptions options = (FileParserOptions) parser.getFileParserPhase().getOptions();
-        initFileParserOptions(options);
+        initFileParserOptions(mibDirs, options);
 
         SmiMib mib = parser.parse();
         assertNotNull(mib);
@@ -64,17 +75,9 @@ public class SmiDefaultParserTest extends TestCase {
 
     }
 
-    private void initFileParserOptions(FileParserOptions options) {
-        String mibsVar = System.getenv("MIBS");
-        assertNotNull(mibsVar);
-        String[] mibDirs = mibsVar.split(":");
+    private void initFileParserOptions(String mibDirsStr, FileParserOptions options) {
+        String[] mibDirs = mibDirsStr.split(",");
         parseDirs(mibDirs, options);
-
-        mibsVar = System.getenv("ASN1_MIBS");
-        if (mibsVar != null) {
-            mibDirs = mibsVar.split(":");
-            // TODO parseDirs(mibDirs, options);
-        }
     }
 
     private void parseDirs(String[] mibDirs, FileParserOptions options) {
@@ -92,7 +95,7 @@ public class SmiDefaultParserTest extends TestCase {
                         && !file.getName().endsWith("tree")
                         && !file.getName().startsWith("Makefile")
                         && !file.getName().endsWith("~")) {
-                        //&& !file.getName().endsWith("-orig")) { // TODO parsing -orig should give more errors!
+                    //&& !file.getName().endsWith("-orig")) { // TODO parsing -orig should give more errors!
                     options.addFile(file);
                 }
             }

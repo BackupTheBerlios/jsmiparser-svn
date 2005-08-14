@@ -22,6 +22,7 @@ import org.jsmiparser.smi.SmiMib;
 import org.jsmiparser.smi.SmiJavaCodeNamingStrategy;
 import org.jsmiparser.util.problem.ProblemReporterFactory;
 import org.jsmiparser.util.token.IdToken;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -32,6 +33,8 @@ import java.util.Map;
 // TODO allow any URL's
 
 public class FileParserPhase implements Phase {
+
+    private static final Logger m_log = Logger.getLogger(FileParserPhase.class);
 
     private FileParserProblemReporter m_pr;
     private Constructor<? extends FileParser> m_fileParserConstructor;
@@ -60,7 +63,7 @@ public class FileParserPhase implements Phase {
     public Object process(Object input) throws PhaseException {
         initFileParserMap();
 
-
+        // TODO this can cause java.util.ConcurrentModificationException
         for (FileParser fileParser : m_fileParserMap.values()) {
             if (fileParser.getState() == FileParser.State.UNPARSED) {
                 fileParser.parse();
@@ -104,8 +107,9 @@ public class FileParserPhase implements Phase {
         FileParser fileParser;
         File file = m_options.findFile(idToken.getId());
         if (file != null) {
-             fileParser = m_fileParserMap.get(file);
+            fileParser = m_fileParserMap.get(file);
             if (fileParser == null) {
+                m_log.error("creating new file parser");
                 fileParser = createFileParser(file);
             }
             if (fileParser.getState() == FileParser.State.PARSING) {
