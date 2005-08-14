@@ -13,25 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jsmiparser.phase.lexer;
+package org.jsmiparser.util.symbol;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class LexerMib {
+public interface IdSymbolList<E extends IdSymbol> extends List<E> {
 
-    private List<LexerModule> m_modules = new ArrayList<LexerModule>();
+    E find(String id);
 
-    public List<LexerModule> getModules() {
-        return m_modules;
-    }
-
-    public LexerModule find(String id) {
-        for (LexerModule module : m_modules) {
-            if (module.getId().equals(id)) {
-                return module;
-            }
-        }
-        return null;
-    }
+    Map<String, List<E>> findDuplicates();
 }

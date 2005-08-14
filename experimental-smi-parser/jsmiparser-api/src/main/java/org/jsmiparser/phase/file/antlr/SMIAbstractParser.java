@@ -58,7 +58,7 @@ public abstract class SMIAbstractParser extends LLkParser implements Context {
         m_locationFactory = new AntlrLocationFactory(this, source);
 
         m_fileParser = fileParser;
-        m_fileParser.getFileParserPhase().setContext(this);
+        m_fileParser.getParserPhase().setContext(this);
     }
 
     public String getSource() {
@@ -103,7 +103,7 @@ public abstract class SMIAbstractParser extends LLkParser implements Context {
 
     protected ASNImports makeImports(List<Token> importTokens, Token fromModuleToken) {
         IdToken moduleToken = idt(fromModuleToken);
-        FileParser importedFileParser = m_fileParser.getFileParserPhase().use(moduleToken);
+        FileParser importedFileParser = m_fileParser.getParserPhase().use(moduleToken);
         ASNImports result = new ASNImports(context_, moduleToken, importedFileParser.getModule());
         for (Token token : importTokens) {
             IdToken idToken = idt(token);
@@ -233,7 +233,7 @@ public abstract class SMIAbstractParser extends LLkParser implements Context {
         ASNDefinedType result = new ASNDefinedType(context_);
 
         if (moduleToken != null) {
-            FileParser fileParser = m_fileParser.getFileParserPhase().use(idt(moduleToken));
+            FileParser fileParser = m_fileParser.getParserPhase().use(idt(moduleToken));
             ASNTypeAssignment ta = fileParser.getTypeMap().use(idt(idToken));
             result.setTypeAssignment(ta);
         } else {
@@ -247,7 +247,7 @@ public abstract class SMIAbstractParser extends LLkParser implements Context {
     protected ASNDefinedValue makeDefinedValue(Token moduleToken, Token idToken) {
         ASNDefinedValue result = new ASNDefinedValue(context_);
         if (moduleToken != null) {
-            FileParser fileParser = m_fileParser.getFileParserPhase().use(idt(moduleToken));
+            FileParser fileParser = m_fileParser.getParserPhase().use(idt(moduleToken));
             ASNValueAssignment va = fileParser.getValueMap().use(idt(idToken));
             result.setValueAssignment(va);
         } else {

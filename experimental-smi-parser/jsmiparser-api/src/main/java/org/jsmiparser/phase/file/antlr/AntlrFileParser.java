@@ -23,17 +23,16 @@ import org.jsmiparser.phase.PhaseException;
 import org.jsmiparser.phase.file.AbstractFileParser;
 import org.jsmiparser.phase.file.FileParserPhase;
 import org.jsmiparser.phase.file.SkipStandardException;
-import org.jsmiparser.phase.file.FileParser;
+import org.jsmiparser.smi.SmiModule;
 import org.jsmiparser.util.location.Location;
 import org.jsmiparser.util.token.IdToken;
-import org.jsmiparser.smi.SmiModule;
-import org.jsmiparser.smi.SmiImports;
-import org.jsmiparser.smi.SmiSymbol;
 
 import java.io.*;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
+
+// TODO delete
 public class AntlrFileParser extends AbstractFileParser {
 
     private static final Logger m_log = Logger.getLogger(AntlrFileParser.class);
@@ -52,7 +51,7 @@ public class AntlrFileParser extends AbstractFileParser {
             is = new BufferedInputStream(new FileInputStream(m_file));
             SMILexer lexer = new SMILexer(is);
             SMIParser parser = new SMIParser(lexer);
-            parser.init(this);
+            //parser.init(this);
 
             m_module = parser.module_definition();
             return m_module;
@@ -105,12 +104,13 @@ public class AntlrFileParser extends AbstractFileParser {
         return new ArrayList<IdToken>();
     }
 
+    /* TODO
     public void addImports(IdToken moduleToken, List<IdToken> importedTokenList) {
         // TODO m_module.addImports(moduleToken, importedTokenList);
 
         // TODO check module imported twice
 
-        FileParser importedFileParser = getFileParserPhase().use(moduleToken);
+        FileParser importedFileParser = getParserPhase().use(moduleToken);
         SmiImports result = new SmiImports(m_module, moduleToken, importedFileParser.getModule());
         for (IdToken idToken : importedTokenList) {
             SmiSymbol symbol = importedFileParser.use(idToken);
@@ -118,9 +118,8 @@ public class AntlrFileParser extends AbstractFileParser {
             // TODO check duplicate
             result.addSymbol(idToken, symbol);
         }
-
-
     }
+    */
 
     public SmiModule makeModule(Token idToken) {
         return createModule(idt(idToken));

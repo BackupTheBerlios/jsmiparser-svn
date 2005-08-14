@@ -42,7 +42,7 @@ public class SmiDefaultParserTest extends TestCase {
         ProblemEventHandler problemEventHandler = new DefaultProblemEventHandler();
         SmiDefaultParser parser = new SmiDefaultParser(problemEventHandler);
         parser.init();
-        FileParserOptions options = (FileParserOptions) parser.getFileParserPhase().getOptions();
+        FileParserOptions options = (FileParserOptions) parser.getLexerPhase().getOptions();
         initFileParserOptions(mibDirs, options);
 
         SmiMib mib = parser.parse();
@@ -92,6 +92,7 @@ public class SmiDefaultParserTest extends TestCase {
                 File file = files[i];
 
                 if (file.isFile()
+                        && !file.getName().startsWith("TOTAL")
                         && !file.getName().endsWith("tree")
                         && !file.getName().startsWith("Makefile")
                         && !file.getName().endsWith("~")) {

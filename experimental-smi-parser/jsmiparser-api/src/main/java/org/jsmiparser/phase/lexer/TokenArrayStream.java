@@ -15,23 +15,31 @@
  */
 package org.jsmiparser.phase.lexer;
 
-import java.util.ArrayList;
+import antlr.Token;
+import antlr.TokenStream;
+import antlr.TokenStreamException;
+import org.jsmiparser.phase.file.antlr.SMILexer;
+
 import java.util.List;
 
-public class LexerMib {
+public class TokenArrayStream implements TokenStream {
 
-    private List<LexerModule> m_modules = new ArrayList<LexerModule>();
+    private List<Token> m_tokens;
+    private int m_index = 0;
 
-    public List<LexerModule> getModules() {
-        return m_modules;
+    public TokenArrayStream(List<Token> tokens) {
+        m_tokens = tokens;
     }
 
-    public LexerModule find(String id) {
-        for (LexerModule module : m_modules) {
-            if (module.getId().equals(id)) {
-                return module;
-            }
+    public Token nextToken() throws TokenStreamException {
+        Token result = null;
+        if (m_index < m_tokens.size()) {
+            result = m_tokens.get(m_index);
+            m_index++;
         }
-        return null;
+        if (result == null) {
+            result = new Token(SMILexer.EOF);
+        }
+        return result;
     }
 }

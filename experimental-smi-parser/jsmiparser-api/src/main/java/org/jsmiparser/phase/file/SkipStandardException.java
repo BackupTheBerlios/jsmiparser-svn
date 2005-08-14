@@ -24,7 +24,7 @@ public class SkipStandardException extends RuntimeException {
 
     private static final Logger m_log = Logger.getLogger(SkipStandardException.class);
 
-    private static Set<String> m_skippedStandardModules = new HashSet<String>();
+    public static final Set<String> m_skippedStandardModules = new HashSet<String>();
 
     static {
         m_skippedStandardModules.add("RFC1065-SMI");

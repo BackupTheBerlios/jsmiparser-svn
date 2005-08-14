@@ -15,16 +15,87 @@
  */
 package org.jsmiparser.phase.lexer;
 
+import antlr.TokenStream;
+import antlr.Token;
+import antlr.TokenStreamException;
+import org.apache.log4j.Logger;
 import org.jsmiparser.phase.Phase;
 import org.jsmiparser.phase.PhaseException;
+import org.jsmiparser.phase.file.FileParserOptions;
+import org.jsmiparser.phase.file.antlr.SMILexer;
+import org.jsmiparser.util.problem.ProblemReporterFactory;
+
+import java.io.*;
+import java.util.List;
 
 public class LexerPhase implements Phase {
 
-    public Object getOptions() {
-        return null;  // TODO
+    private static final Logger m_log = Logger.getLogger(LexerPhase.class);
+
+    private FileParserOptions m_options = new FileParserOptions();
+    private LexerMib m_lexerMib;
+
+    public LexerPhase(ProblemReporterFactory problemReporterFactory) {
+        // TODO
+    }
+
+    public FileParserOptions getOptions() {
+        return m_options;
     }
 
     public LexerMib process(Object input) throws PhaseException {
-        return null;  // TODO
+        m_lexerMib = new LexerMib();
+
+        for (File file : m_options.getInputFileList()) {
+            lexFile(file);
+        }
+
+        // TODO lots of work with input dirs, used dirs, used files etc
+
+        return m_lexerMib;
+    }
+
+    private void lexFile(File file) {
+
+        InputStream is = null;
+        try {
+            is = new BufferedInputStream(new FileInputStream(file));
+            SMILexer lexer = new SMILexer(is);
+            lex(lexer, file.getPath(), m_lexerMib.getModules());
+        } catch (TokenStreamException e) {
+            m_log.error(e.getClass().getSimpleName(), e);
+            throw new PhaseException(e);
+        } catch (FileNotFoundException e) {
+            m_log.error(e.getClass().getSimpleName(), e);
+            throw new PhaseException(e);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    throw new PhaseException(e);
+                }
+            }
+        }
+    }
+
+    // TODO this approach can leave various tokens between and before modules fix this
+    public static void lex(TokenStream ts, String source, List<LexerModule> modules) throws TokenStreamException {
+        LexerModule module = null;
+        Token prev = ts.nextToken();
+        Token current = ts.nextToken();
+        while (current != null && current.getType() != SMILexer.EOF) {
+            if (prev.getType() == SMILexer.UPPER && current.getType() == SMILexer.DEFINITIONS_KW) {
+                module = new LexerModule(prev.getText(), source);
+                modules.add(module);
+                module.add(prev);
+            }
+            if (module != null) {
+                module.add(current);
+            }
+
+            prev = current;
+            current = ts.nextToken();
+        }
     }
 }

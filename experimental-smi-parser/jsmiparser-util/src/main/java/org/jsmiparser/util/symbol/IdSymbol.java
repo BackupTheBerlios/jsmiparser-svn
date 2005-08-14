@@ -13,25 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jsmiparser.phase.lexer;
+package org.jsmiparser.util.symbol;
 
-import java.util.ArrayList;
-import java.util.List;
+public interface IdSymbol {
 
-public class LexerMib {
-
-    private List<LexerModule> m_modules = new ArrayList<LexerModule>();
-
-    public List<LexerModule> getModules() {
-        return m_modules;
-    }
-
-    public LexerModule find(String id) {
-        for (LexerModule module : m_modules) {
-            if (module.getId().equals(id)) {
-                return module;
-            }
-        }
-        return null;
-    }
+    String getId();
 }

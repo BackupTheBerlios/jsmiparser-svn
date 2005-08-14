@@ -16,20 +16,35 @@
 package org.jsmiparser.phase.lexer;
 
 import org.apache.log4j.Logger;
+import org.jsmiparser.util.symbol.IdSymbolImpl;
 import antlr.TokenStream;
+import antlr.Token;
 
-public class LexerModule {
+import java.util.List;
+import java.util.ArrayList;
+
+public class LexerModule extends IdSymbolImpl {
     private static final Logger m_log = Logger.getLogger(LexerModule.class);
 
     private String m_source;
+    private List<Token> m_tokens = new ArrayList<Token>(100);
 
+    public LexerModule(String id, String source) {
+        super(id);
+        m_source = source;
 
+        m_log.debug("Created " + id + " from " + source);        
+    }
 
     public String getSource() {
         return m_source;
     }
 
     public TokenStream createTokenStream() {
-        return null; // TODO
+        return new TokenArrayStream(m_tokens);
+    }
+
+    public void add(Token token) {
+        m_tokens.add(token);
     }
 }

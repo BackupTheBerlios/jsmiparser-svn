@@ -182,9 +182,11 @@ WS
 }
 ;
 
-BUG
+SMIC_DIRECTIVE
 :
-	"SMI TRAP-TYPE"
+(
+	"SMI" WS ("OBJECT-TYPE"|"TRAP-TYPE")
+)
 {
 	$setType(Token.SKIP);
 }
@@ -295,10 +297,10 @@ options	{
 }
 
 {
-	private AntlrFileParser m_fp;
+	private ModuleParser m_mp;
 
-	public void init(AntlrFileParser fp) {
-		m_fp = fp;
+	public void init(ModuleParser mp) {
+		m_mp = mp;
 	}
 }
 
@@ -317,7 +319,7 @@ module_identifier returns [SmiModule result = null]
 	u:UPPER
 {
 	SkipStandardException.skip(u.getText());
-	result = m_fp.makeModule(u);
+	result = m_mp.makeModule(u);
 }
 ;
 
@@ -346,11 +348,11 @@ symbols_from_module
 :
 	idTokenList=symbol_list FROM_KW m=upper
 {
-	m_fp.addImports(m, idTokenList);
+	m_mp.addImports(m, idTokenList);
 } 
 ;
 
-symbol_list returns [List<IdToken> result = m_fp.makeIdTokenList()]
+symbol_list returns [List<IdToken> result = m_mp.makeIdTokenList()]
 {
 	IdToken s1 = null, s2 = null;
 }
@@ -384,7 +386,7 @@ macroName returns [IdToken result = null]
 	| tt:"TRAP-TYPE"
 )
 {
-	result = m_fp.idt(ot, mi, oi, nt, tc, og, ng, mc, ac, tt);
+	result = m_mp.idt(ot, mi, oi, nt, tc, og, ng, mc, ac, tt);
 }
 ;
 
@@ -442,7 +444,7 @@ integer_type_id returns [IdToken result = null]
 	| tt  : "TimeTicks"
 )
 {
-	result = m_fp.idt(i32, c, c32, g, g32, c64, tt);
+	result = m_mp.idt(i32, c, c32, g, g32, c64, tt);
 }
 ;
 
@@ -864,7 +866,7 @@ upper returns [IdToken result = null]
 :
 	u:UPPER
 {
-	result = m_fp.idt(u);
+	result = m_mp.idt(u);
 }
 ;
 
@@ -872,6 +874,6 @@ lower returns [IdToken result = null]
 :
 	l:LOWER
 {
-	result = m_fp.idt(l);
+	result = m_mp.idt(l);
 }
 ;

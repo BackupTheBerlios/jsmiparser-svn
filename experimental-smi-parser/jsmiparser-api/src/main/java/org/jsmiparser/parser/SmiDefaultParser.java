@@ -18,9 +18,9 @@ package org.jsmiparser.parser;
 import org.jsmiparser.phase.CompositePhase;
 import org.jsmiparser.phase.Phase;
 import org.jsmiparser.phase.PhaseException;
+import org.jsmiparser.phase.lexer.LexerPhase;
 import org.jsmiparser.phase.cm.ConceptualModelBuilderPhase;
 import org.jsmiparser.phase.file.FileParserPhase;
-import org.jsmiparser.phase.file.antlr.AntlrFileParser;
 import org.jsmiparser.phase.oid.OidResolverPhase;
 import org.jsmiparser.phase.quality.MibQualityCheckerPhase;
 import org.jsmiparser.smi.SmiMib;
@@ -34,6 +34,7 @@ public class SmiDefaultParser extends CompositePhase implements SmiParser {
     private Phase m_oidResolverPhase;
     private Phase m_mibQualityCheckerPhase;
     private Phase m_conceptualModelBuilderPhase;
+    private Phase m_lexerPhase;
 
     protected SmiDefaultParser() {
         super(new DefaultProblemReporterFactory(new DefaultProblemEventHandler()));
@@ -44,6 +45,9 @@ public class SmiDefaultParser extends CompositePhase implements SmiParser {
     }
 
     public void init() {
+
+        m_lexerPhase = createLexerPhase();
+        addOptionalPhase(m_lexerPhase);
 
         m_fileParserPhase = createFileParserPhase();
         addOptionalPhase(m_fileParserPhase);
@@ -58,8 +62,12 @@ public class SmiDefaultParser extends CompositePhase implements SmiParser {
         addOptionalPhase(m_conceptualModelBuilderPhase);
     }
 
+    protected Phase createLexerPhase() {
+        return new LexerPhase(m_problemReporterFactory);
+    }
+
     protected Phase createFileParserPhase() {
-        return new FileParserPhase(m_problemReporterFactory, AntlrFileParser.class);
+        return new FileParserPhase(m_problemReporterFactory);
     }
 
     protected OidResolverPhase createOidResolverPhase() {
@@ -78,6 +86,10 @@ public class SmiDefaultParser extends CompositePhase implements SmiParser {
         if (phase != null) {
             addPhase(phase);
         }
+    }
+
+    public Phase getLexerPhase() {
+        return m_lexerPhase;
     }
 
     public Phase getFileParserPhase() {
