@@ -1,0 +1,34 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.jsmiparser</groupId>
+  <artifactId>jsmiparser-root</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <modules>
+    <module>jsmiparser-util</module>
+    <module>jsmiparser-api</module>
+  </modules>
+
+  <!--
+  <pluginRepositories>
+    <pluginRepository>http://www.neonics.com/maven2</pluginRepository>
+  </pluginRepositories>
+  -->
+
+
+  <build>
+    <defaultGoal>install</defaultGoal>
+
+    <plugins>
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-compiler-plugin</artifactId>
+	<configuration>
+	  <source>1.5</source>
+	  <target>1.5</target>
+	</configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
