@@ -67,7 +67,9 @@ public class FileParserPhase implements Phase {
                 moduleParser.parse();
             }
         }
-        
+
+        m_oidMgr.check();
+
         return m_mib;
     }
 

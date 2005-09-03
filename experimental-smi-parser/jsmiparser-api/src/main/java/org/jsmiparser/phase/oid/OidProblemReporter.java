@@ -25,7 +25,7 @@ public interface OidProblemReporter {
     @ProblemMethod(message = "fixStart couldn't find root child: %s")
     void reportMissingRootChild(String id);
 
-    @ProblemMethod(message = "ASN OID that starts without a name, must start with 0, 1 or 2: %d")
+    @ProblemMethod(message = "Object identifier that starts without a name, must start with 0, 1 or 2: %d")
     void reportInvalidOidStart(BigInteger subId);
 
     @ProblemMethod(message = "Null new node for %s")
@@ -49,9 +49,21 @@ public interface OidProblemReporter {
     @ProblemMethod(message = "Not a valid start node %d")
     void reportNotAValidStartNode(Location location, BigInteger number);
 
-    @ProblemMethod(message = "%s is not the expected identifier %s")
-    void reportIdMismatch(Location location, String id, String expectedId);
+    @ProblemMethod(message = "%s is not the expected identifier %s (%s) %s")
+    void reportIdMismatch(Location location, String id, String origId, Location origLocation, String s);
 
     @ProblemMethod(message = "%d is not the expected number %d")
     void reportNumberMismatch(Location location, BigInteger number, BigInteger expectedNumber);
+
+    @ProblemMethod(message = "Oid component value is not resolved for %s")
+    void reportValueNotResolved(Location location, String id);
+
+    @ProblemMethod(message = "Parent oid component is not resolved for %s")
+    void reportParentNotResolved(Location location, String id);
+
+    @ProblemMethod(message = "%s has the same oid component value %d under the common parent %s as %s (%s)")
+    void reportChildWithDuplicateValue(Location newLocation, String newId, BigInteger value, String parentId, String oldId, Location oldLocation);
+
+    @ProblemMethod(message = "While resolving %s under %s (%s) detected an oid node with the same name under %s (%s) ")
+    void reportDifferentParent(Location childLocation, String childId, String parentId, Location parentLocation, String origParentId, Location origParentLocation);
 }

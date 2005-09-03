@@ -40,24 +40,24 @@ public class OidMgr {
     public OidMgr(ProblemReporterFactory prf) {
         m_pr = prf.create(OidMgr.class.getClassLoader(), OidProblemReporter.class);
 
-        root_ = new OidNode(m_pr, null, new IdToken(null, "rootNode"), new BigIntegerToken(null, false, "0"));
+        root_ = create(null, new IdToken(null, OidNode.ROOT_NODE_NAME), new BigIntegerToken(null, false, "0"));
 
         // see http://asn1.elibel.tm.fr
 
-        // TODO by default disable some of this shaky standard root names
+        // TODO by default disable some of these shaky standard root names
 
-        OidNode node0 = new OidNode(m_pr, root_, new IdToken(null, "itu-t"), new BigIntegerToken(null, false, "0"));
+        OidNode node0 = create(root_, new IdToken(null, "itu-t"), new BigIntegerToken(null, false, "0"));
         m_standardSubIdMap.put(node0.getValue(), node0);
         m_idNodeMap.put("itu-t", node0);
         m_idNodeMap.put("ccitt", node0);
         m_idNodeMap.put("itu-r", node0);
         m_idNodeMap.put("itu", node0);
 
-        OidNode node1 = new OidNode(m_pr, root_, new IdToken(null, "iso"), new BigIntegerToken(null, false, "1"));
+        OidNode node1 = create(root_, new IdToken(null, "iso"), new BigIntegerToken(null, false, "1"));
         m_standardSubIdMap.put(node1.getValue(), node1);
         m_idNodeMap.put("iso", node1);
 
-        OidNode node2 = new OidNode(m_pr, root_, new IdToken(null, "joint-iso-itu-t"), new BigIntegerToken(null, false, "2"));
+        OidNode node2 = create(root_, new IdToken(null, "joint-iso-itu-t"), new BigIntegerToken(null, false, "2"));
         m_standardSubIdMap.put(node2.getValue(), node2);
         m_idNodeMap.put("joint-iso-itu-t", node2);
         m_idNodeMap.put("joint-iso-ccitt", node2);
@@ -83,42 +83,61 @@ public class OidMgr {
 
         // we always make one, to avoid crashes
         if (result == null) {
-            result = new OidNode(m_pr, parent, id, subId);
+            result = create(parent, id, subId);
         }
         return result;
     }
     */
 
     public OidNode registerNode(IdToken idToken, OidNode newNode) {
-        //System.out.println("registering node " + idToken.getId() + " " + idToken.getLocation());
-
-        if (newNode == null) {
-            m_pr.reportNewNullNode(idToken.getLocation(), idToken.getId());
-            return newNode;
-        }
-
-        if (newNode.getId() == null) {
+        if (newNode.m_idToken == null) {
             newNode.m_idToken = idToken;
         }
 
         OidNode result = null;
         OidNode oldNode = findNode(idToken.getId());
         if (oldNode != null) {
+            oldNode.setOrCheckValueToken(newNode.m_valueToken);
+            if (newNode.m_parent != null) {
+                if (oldNode.m_parent == null) {
+                    oldNode.m_parent = newNode.m_parent;
+                    oldNode.m_parent.m_children.add(oldNode);
+                } else {
+                    if (newNode.m_parent != oldNode.m_parent) {
+                        m_pr.reportDifferentParent(newNode.getLocation(), newNode.getId(),
+                                newNode.getParent().getId(), newNode.getParent().getLocation(),
+                                oldNode.getParent().getId(), oldNode.getParent().getLocation());
+                        result = newNode;
+                    }
+                }
+            }
+            if (result == null) {
+                result = oldNode;
+                if (oldNode.m_parent != null) {
+                    newNode.m_parent.m_children.remove(newNode);
+                }
+            }
+            /*
             if (oldNode.m_valueToken == null && newNode.m_valueToken != null) {
                 oldNode.m_valueToken = newNode.m_valueToken;
-            }
-            else if (newNode.equals(oldNode)) {
+            } else if (newNode.equals(oldNode)) {
                 result = oldNode;
             } else {
                 m_pr.reportOidAlreadyRegistered(idToken.getLocation(), idToken.getId(), oldNode.getIdToken().getLocation());
             }
+            */
         } else {
-            m_idNodeMap.put(idToken.getId(), newNode);
+            m_idNodeMap.put(newNode.getId(), newNode);
+            result = newNode;
         }
-        if (result == null) {
-            return newNode;
-        }
+
         return result;
+    }
+
+    public void check() {
+        for (OidNode oidNode : m_idNodeMap.values()) {
+            oidNode.check();
+        }
     }
 
 
@@ -176,25 +195,16 @@ public class OidMgr {
             result = m_idNodeMap.get(idToken.getId());
             if (result != null) {
                 checkStartOidNode(result, idToken, valueToken);
-            } else if (valueToken != null) {
-                result = m_standardSubIdMap.get(valueToken.getValue());
-                if (result != null) {
-                    checkStartOidNode(result, idToken, valueToken);
-                }
-            }
-            if (result == null) {
-                m_pr.reportCannotFindOidNode(idToken.getLocation(), idToken.getId());
-                result = new OidNode(m_pr, null, idToken, valueToken);
-                m_idNodeMap.put(idToken.getId(), result);
+            } else {
+                result = create(null, idToken, valueToken);
             }
         } else {
             result = m_standardSubIdMap.get(valueToken.getValue());
             if (result != null) {
                 checkStartOidNode(result, idToken, valueToken);
-            }
-            if (result == null) {
+            } else {
                 m_pr.reportInvalidOidStart(valueToken.getValue());
-                result = new OidNode(m_pr, null, idToken, valueToken);
+                result = createDummy(null, idToken, valueToken);
             }
         }
 
@@ -212,7 +222,7 @@ public class OidMgr {
         }
         */
         if (idToken != null && !idToken.getId().equals(result.getId())) {
-            m_pr.reportIdMismatch(idToken.getLocation(), idToken.getId(), result.getId());
+            m_pr.reportIdMismatch(idToken.getLocation(), idToken.getId(), result.getId(), result.getLocation(), "checkStartOidNode");
         }
         if (valueToken != null && !valueToken.getValue().equals(result.getValue())) {
             m_pr.reportNumberMismatch(valueToken.getLocation(), valueToken.getValue(), result.getValue());
@@ -243,10 +253,12 @@ public class OidMgr {
     }
 
 
-
     public OidNode resolve2(OidNode parent, IdToken idToken, BigIntegerToken valueToken) {
         OidNode result = null;
-        if (idToken != null) {
+
+        if (parent == null && idToken == null) {
+            // it must be one of the three roots
+        } else if (idToken != null) {
             result = findNode(idToken.getId());
             if (result != null) {
 
@@ -259,7 +271,6 @@ public class OidMgr {
                     if (result != null) {
                         assert(result.m_idToken == null);
                         result.m_idToken = idToken;
-                        
                     }
                 }
             }
@@ -269,6 +280,42 @@ public class OidMgr {
 
         assert(result != null);
         return result;
+    }
+
+
+    public OidNode resolve3(OidNode parent, IdToken idToken, BigIntegerToken valueToken) {
+        assert(idToken != null || valueToken != null);
+        OidNode result = null;
+
+        if (parent == null) {
+            if (idToken != null) {
+
+            } else {
+                // one of the three roots
+            }
+        } else {
+            //result = parent.resolveChild()
+        }
+
+
+        assert(result != null);
+        return result;
+    }
+
+    OidNode create(OidNode parent, IdToken idToken, BigIntegerToken valueToken) {
+        OidNode result = new OidNode(this, parent, idToken, valueToken);
+        if (idToken != null) {
+            assert(m_idNodeMap.get(result.getId()) == null);
+            m_idNodeMap.put(result.getId(), result);
+        }
+        if (parent != null) {
+            parent.m_children.add(result);
+        }
+        return result;
+    }
+
+    OidNode createDummy(OidNode parent, IdToken idToken, BigIntegerToken valueToken) {
+        return new OidNode(this, parent, idToken, valueToken);
     }
 
 }

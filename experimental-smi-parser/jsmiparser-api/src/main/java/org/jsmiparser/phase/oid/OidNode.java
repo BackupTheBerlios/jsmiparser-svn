@@ -17,6 +17,7 @@ package org.jsmiparser.phase.oid;
 
 import org.jsmiparser.util.token.BigIntegerToken;
 import org.jsmiparser.util.token.IdToken;
+import org.jsmiparser.util.location.Location;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -25,17 +26,21 @@ import java.util.List;
 public class OidNode {
 
     OidProblemReporter m_pr;
+    OidMgr m_oidMgr;
     IdToken m_idToken;
     BigIntegerToken m_valueToken;
     OidNode m_parent;
 
     List<OidNode> m_children = new ArrayList<OidNode>();
 
+    static final String ROOT_NODE_NAME = "jsmiparser#rootNode";
+
     //Map<BigInteger, OidNode> m_valueChildMap = new HashMap<BigInteger, OidNode>();
 
-    public OidNode(OidProblemReporter pr, OidNode parent, IdToken idToken, BigIntegerToken valueToken) {
+    public OidNode(OidMgr oidMgr, OidNode parent, IdToken idToken, BigIntegerToken valueToken) {
         super();
-        m_pr = pr;
+        m_pr = oidMgr.m_pr;
+        m_oidMgr = oidMgr;
         m_parent = parent;
         m_idToken = idToken;
         m_valueToken = valueToken;
@@ -167,41 +172,115 @@ public class OidNode {
 
         if (idToken != null) {
             result = findChild(idToken.getId());
-            if (result != null && valueToken != null) {
-                if (result.getValue() != null) {
-                    if (!valueToken.equals(result.getValue())) {
-                        m_pr.reportNumberMismatch(valueToken.getLocation(), valueToken.getValue(), result.getValue());
-                    }
+            if (result != null) {
+                result.setOrCheckValueToken(valueToken);
+                // setOrCheckParent not needed
+            } else {
+                result = m_oidMgr.findNode(idToken.getId());
+                if (result != null) {
+                    result.setOrCheckValueToken(valueToken);
+                    result.setOrCheckParent(this);
                 } else {
-                    result.m_valueToken = valueToken;
+                    if (valueToken != null) {
+                        result = findChild(valueToken.getValue());
+                        if (result != null) {
+                            result.setOrCheckIdToken(idToken);
+                            // result.setOrCheckParent not needed
+                        } else {
+                            result = m_oidMgr.create(this, idToken, valueToken);
+                        }
+                    } else {
+                        result = m_oidMgr.create(this, idToken, valueToken);
+                    }
                 }
             }
-        }
-
-        if (result == null && valueToken != null) {
+        } else {
             result = findChild(valueToken.getValue());
-            if (result != null && idToken != null) {
-                if (result.getId() != null) {
-                    if (!idToken.equals(result.getId())) {
-                        m_pr.reportIdMismatch(idToken.getLocation(), idToken.getId(), getId());
-                    }
-                } else {
-                    result.m_idToken = idToken;
-                }
+            if (result != null) {
+                // result.setOrCheckParent not needed
+                // result.setOrCheckIdToken not needed since we don't have an idToken
+            } else {
+                result = m_oidMgr.create(this, idToken, valueToken);
             }
         }
 
-        if (result == null) {
-            result = new OidNode(m_pr, this, idToken, valueToken);
-        }
-
+        assert(result != null);
         return result;
     }
 
-    public void check() {
-        // TODO check that id and value are filled in
+    void setOrCheckParent(OidNode parent) {
+        if (parent != null) {
+            if (m_parent == null) {
+                m_parent = parent;
+                parent.m_children.add(this);
+            } else {
+                if (m_parent != parent) {
+                    m_pr.reportDifferentParent(getLocation(), getId(), parent.getId(), parent.getLocation(), m_parent.getId(), m_parent.getLocation());
+                }
+            }
+        }
+    }
 
-        // TODO check that all children have unique ids and values
+    public Location getLocation() {
+        if (m_idToken != null) {
+            return m_idToken.getLocation();
+        } else if (m_valueToken != null) {
+            return m_valueToken.getLocation();
+        }
+        return null;
+    }
+
+    void setOrCheckIdToken(IdToken idToken) {
+        if (idToken != null) {
+            if (m_idToken != null) {
+                if (!idToken.getId().equals(getId())) {
+                    m_pr.reportIdMismatch(idToken.getLocation(), idToken.getId(), getId(), getLocation(), "setOrCheckIdToken");
+                }
+            } else {
+                m_idToken = idToken;
+            }
+        }
+    }
+
+    void setOrCheckValueToken(BigIntegerToken valueToken) {
+        if (valueToken != null) {
+            if (m_valueToken != null) {
+                if (!valueToken.getValue().equals(getValue())) {
+                    m_pr.reportNumberMismatch(valueToken.getLocation(), valueToken.getValue(), getValue());
+                }
+            } else {
+                m_valueToken = valueToken;
+            }
+        }
+    }
+
+    public void check() {
+        assert(m_idToken != null);
+
+        if (m_valueToken == null) {
+            m_pr.reportValueNotResolved(m_idToken.getLocation(), getId());
+        }
+        if (!isRootNode() && m_parent == null) {
+            m_pr.reportParentNotResolved(m_idToken.getLocation(), getId());
+        }
+
+        // not necessary as long a we do a global unique name check:
+        // check that all children have unique ids
+
+        // TODO child value uniqueness should be checked for anonymous nodes as well.
+        for (OidNode child : m_children) {
+            if (child.m_valueToken != null) {
+                OidNode oldChild = findChild(child.getValue());
+                if (oldChild != child) {
+                    m_pr.reportChildWithDuplicateValue(child.m_idToken.getLocation(), child.getId(), child.getValue(), getId(), oldChild.getId(), oldChild.m_idToken.getLocation());
+                }
+            }
+        }
+    }
+
+    private boolean isRootNode() {
+        // don't use the "m_parent == null", as that could be the case for any node during parsing.
+        return getId() == ROOT_NODE_NAME;
     }
 
     public IdToken getIdToken() {
