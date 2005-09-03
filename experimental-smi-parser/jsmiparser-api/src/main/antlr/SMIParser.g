@@ -22,6 +22,7 @@ package org.jsmiparser.phase.file.antlr;
 import org.jsmiparser.util.token.*;
 import org.jsmiparser.smi.*;
 import org.jsmiparser.phase.file.*;
+import org.jsmiparser.phase.oid.*;
 
 import antlr.*;
 import java.lang.* ;
@@ -394,7 +395,7 @@ macroName returns [IdToken result = null]
 assignment
 :
 	UPPER ASSIGN_OP type_assignment
-	| LOWER value_assignment
+	| l:LOWER value_assignment[m_mp.idt(l)]
 ;
 
 type_assignment
@@ -518,24 +519,24 @@ range_value
 
 // VALUES
 
-value_assignment
+value_assignment[IdToken idToken]
 :
-	macro_value_assignment
-	| primitive_value_assignment
+	macro_value_assignment[idToken]
+	| primitive_value_assignment[idToken]
 ;
 
-primitive_value_assignment
+primitive_value_assignment[IdToken idToken]
 :
-	OBJECT_KW IDENTIFIER_KW ASSIGN_OP oid_value
+	OBJECT_KW IDENTIFIER_KW ASSIGN_OP oid_value[idToken]
 ;
 
-macro_value_assignment
+macro_value_assignment[IdToken idToken]
 :
-	oid_macro_value_assignment
+	oid_macro_value_assignment[idToken]
 	| int_macro_value_assignment
 ;
 
-oid_macro_value_assignment
+oid_macro_value_assignment[IdToken idToken]
 :
 	(objecttype_macro
 	| moduleidentity_macro 
@@ -545,7 +546,7 @@ oid_macro_value_assignment
 	| notificationgroup_macro
 	| modulecompliance_macro
 	| agentcapabilities_macro)
-	ASSIGN_OP oid_value
+	ASSIGN_OP oid_value[idToken]
 	// TODO it's probably better to move the oid stuff into the macro def
 ;
 
@@ -559,24 +560,29 @@ leaf_value
 :
 	integer_value
 	| (bits_value) => bits_value
-	| oid_value
+	| oid_value[null]
 	| octet_string_value
 	| defined_value
 	| NULL_KW
 ;
 
 
-oid_value
+oid_value [IdToken idToken] returns [OidNode oc = null]
 :
 	L_BRACE
-		(oid_component)+
+		(oc=oid_component[oc])+
 	R_BRACE
+{
+	if (idToken != null) {
+		oc = m_mp.registerOid(idToken, oc);
+	}
+}
 ;
 
-oid_component
+oid_component[OidNode parent] returns [OidNode oc = null]
 :
-	NUMBER
-	| LOWER (L_PAREN NUMBER R_PAREN)?
+	nt1:NUMBER { oc = m_mp.resolveOidComponent(parent, null, nt1); }
+	| (lt:LOWER (L_PAREN nt2:NUMBER R_PAREN)?) { oc = m_mp.resolveOidComponent(parent, lt, nt2); }
 ;
 
 octet_string_value

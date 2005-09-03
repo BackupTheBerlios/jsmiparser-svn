@@ -23,10 +23,13 @@ import org.jsmiparser.parsetree.asn1.ASNAssignment;
 import org.jsmiparser.phase.PhaseException;
 import org.jsmiparser.phase.file.antlr.SMIParser;
 import org.jsmiparser.phase.lexer.LexerModule;
+import org.jsmiparser.phase.oid.OidNode;
 import org.jsmiparser.smi.*;
 import org.jsmiparser.util.location.Location;
 import org.jsmiparser.util.symbol.IdSymbolImpl;
+import org.jsmiparser.util.token.BigIntegerToken;
 import org.jsmiparser.util.token.IdToken;
+import org.jsmiparser.util.token.IntegerToken;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -190,6 +193,15 @@ public class ModuleParser extends IdSymbolImpl {
         return null;
     }
 
+    public IntegerToken intt(Token t) {
+        int value = Integer.parseInt(t.getText());
+        return new IntegerToken(makeLocation(t), value);
+    }
+
+    public BigIntegerToken bintt(Token t) {
+        return new BigIntegerToken(makeLocation(t), false, t.getText());
+    }
+
     public List<IdToken> makeIdTokenList() {
         return new ArrayList<IdToken>();
     }
@@ -215,5 +227,23 @@ public class ModuleParser extends IdSymbolImpl {
         return createModule(idt(idToken));
     }
 
+    public OidNode resolveOidComponent(OidNode parent, Token it, Token nt) {
+        OidNode result = null;
+
+        IdToken idToken = (it == null ? null : idt(it));
+        BigIntegerToken valueToken = (nt == null ? null : bintt(nt));
+
+        if (parent == null) {
+            result = getParserPhase().getOidMgr().resolveStart(idToken, valueToken);
+        } else {
+            result = parent.resolveChild(idToken, valueToken);
+        }
+
+        return result;
+    }
+
+    public OidNode registerOid(IdToken idToken, OidNode oc) {
+        return getParserPhase().getOidMgr().registerNode(idToken, oc);
+    }
 
 }

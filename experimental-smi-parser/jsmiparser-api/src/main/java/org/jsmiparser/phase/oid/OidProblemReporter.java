@@ -16,6 +16,7 @@
 package org.jsmiparser.phase.oid;
 
 import org.jsmiparser.util.problem.annotations.ProblemMethod;
+import org.jsmiparser.util.location.Location;
 
 import java.math.BigInteger;
 
@@ -28,17 +29,29 @@ public interface OidProblemReporter {
     void reportInvalidOidStart(BigInteger subId);
 
     @ProblemMethod(message = "Null new node for %s")
-    void reportNewNullNode(String id);
+    void reportNewNullNode(Location location, String id);
 
-    @ProblemMethod(message = "ASN oid already registered for %s")
-    void reportOidAlreadyRegistered(String id);
+    @ProblemMethod(message = "Object identifier already registered for %s at %s")
+    void reportOidAlreadyRegistered(Location location, String id, Location location1);
 
     @ProblemMethod(message = "Can't find oid node %s")
-    void reportCannotFindOidNode(String id);
+    void reportCannotFindOidNode(Location location, String id);
 
     @ProblemMethod(message = "Cannot use unresolved oid %s that has a subId")
     void reportCannotResolveUnresolvedOid(String id);
 
     @ProblemMethod(message = "Unresolved oid %s")
     void reportUnresolvedOid(String id);
+
+    @ProblemMethod(message = "Not a valid start node %s")
+    void reportNotAValidStartNode(Location location, String id);
+
+    @ProblemMethod(message = "Not a valid start node %d")
+    void reportNotAValidStartNode(Location location, BigInteger number);
+
+    @ProblemMethod(message = "%s is not the expected identifier %s")
+    void reportIdMismatch(Location location, String id, String expectedId);
+
+    @ProblemMethod(message = "%d is not the expected number %d")
+    void reportNumberMismatch(Location location, BigInteger number, BigInteger expectedNumber);
 }

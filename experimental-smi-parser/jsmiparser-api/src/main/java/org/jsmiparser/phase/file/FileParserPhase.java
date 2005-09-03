@@ -17,6 +17,7 @@ package org.jsmiparser.phase.file;
 
 import org.jsmiparser.phase.Phase;
 import org.jsmiparser.phase.PhaseException;
+import org.jsmiparser.phase.oid.OidMgr;
 import org.jsmiparser.phase.lexer.LexerMib;
 import org.jsmiparser.phase.lexer.LexerModule;
 import org.jsmiparser.smi.SmiJavaCodeNamingStrategy;
@@ -39,10 +40,12 @@ public class FileParserPhase implements Phase {
     private IdSymbolList<ModuleParser> m_parserModules = new IdSymbolListImpl<ModuleParser>();
     private IdSymbolList<ModuleParser> m_usedParserModules = new IdSymbolListImpl<ModuleParser>();
     private IdSymbolList<ModuleParser> m_unresolvedParserModules = new IdSymbolListImpl<ModuleParser>();
+    private OidMgr m_oidMgr;
 
     public FileParserPhase(ProblemReporterFactory prf) {
         super();
         m_pr = prf.create(FileParserPhase.class.getClassLoader(), FileParserProblemReporter.class);
+        m_oidMgr = new OidMgr(prf);
     }
 
     public FileParserProblemReporter getFileParserProblemReporter() {
@@ -109,5 +112,9 @@ public class FileParserPhase implements Phase {
             m_mib = new SmiMib(new SmiJavaCodeNamingStrategy("org.jsmiparser.mib")); // TODO
         }
         return m_mib;
+    }
+
+    public OidMgr getOidMgr() {
+        return m_oidMgr;
     }
 }
