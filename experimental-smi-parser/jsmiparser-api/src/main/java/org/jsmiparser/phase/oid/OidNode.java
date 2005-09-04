@@ -23,6 +23,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO rename to OidComponent
+// TODO move to smi or to phase.parser unit
 public class OidNode {
 
     OidProblemReporter m_pr;

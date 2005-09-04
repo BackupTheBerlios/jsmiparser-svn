@@ -19,50 +19,18 @@ import org.jsmiparser.util.token.IdToken;
 
 import java.math.BigInteger;
 
-public abstract class SmiAttribute extends SmiValue {
-	
-	private SmiType type_;
-	private String oid_;
-	private SmiSingleAttributeEnum singleAttributeEnum_;
-	private SmiPrimitiveType primitiveType_;
+public abstract class SmiAttribute extends SmiObjectType {
+
+    private SmiSingleAttributeEnum singleAttributeEnum_;
 
 
-	public SmiAttribute(IdToken idToken, SmiModule module) {
+    public SmiAttribute(IdToken idToken, SmiModule module) {
 		super(idToken, module);
 	}
 
 	public abstract SmiClass getSmiClass();
 
-	public SmiPrimitiveType getPrimitiveType() {
-		if (type_ != null) {
-			return type_.getPrimitiveType();
-		}
-		else {
-			return primitiveType_;
-		}
-	}
-	
-	public void setPrimitiveType(SmiPrimitiveType primitiveType) {
-		primitiveType_ = primitiveType;
-	}
-
-	public SmiType getType() {
-		return type_;
-	}
-
-	public void setType(SmiType type) {
-		type_ = type;
-	}
-
-	public String getOid() {
-		return oid_;
-	}
-
-	public void setOid(String oid) {
-		oid_ = oid;
-	}
-
-	public String getCodeConstantId() {
+    public String getCodeConstantId() {
 		return getModule().getMib().getCodeNamingStrategy().getCodeConstantId(this);
 	}
 	
@@ -71,7 +39,7 @@ public abstract class SmiAttribute extends SmiValue {
 	}
 
 	public String getCodeOid() {
-		return oid_;
+		return getOid();
 	}
 
 	public String getCodeId() {
