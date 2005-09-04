@@ -231,8 +231,6 @@ public class ModuleParser extends IdSymbolImpl {
             // TODO check duplicate
             result.addSymbol(idToken, symbol);
         }
-
-
     }
 
     public SmiModule makeModule(Token idToken) {
@@ -265,81 +263,85 @@ public class ModuleParser extends IdSymbolImpl {
     }
 
     public SmiOidMacro createOidMacro(IdToken idToken) {
-         return new SmiOidMacro(idToken, m_module);
-     }
+        return new SmiOidMacro(idToken, m_module);
+    }
 
-     public SmiAttribute createVariable(IdToken idToken, SmiType t) {
-         SmiAttribute result = new SmiAttribute(idToken, m_module);
-         result.setType(t);
-         return result;
-     }
+    public SmiAttribute createVariable(IdToken idToken, SmiType t) {
+        SmiAttribute result = new SmiAttribute(idToken, m_module);
+        result.setType(t);
+        return result;
+    }
 
-     public SmiRow createRow(IdToken idToken, SmiType t) {
-         SmiRow result = new SmiRow(idToken, m_module);
-         result.setType(t);
-         return result;
-     }
+    public SmiRow createRow(IdToken idToken, SmiType t) {
+        SmiRow result = new SmiRow(idToken, m_module);
+        result.setType(t);
+        return result;
+    }
 
-     public SmiTable createTable(IdToken idToken, SmiType t) {
-         SmiTable result = new SmiTable(idToken, m_module);
-         result.setType(t);
-         return result;
-     }
+    public SmiTable createTable(IdToken idToken, SmiType t) {
+        SmiTable result = new SmiTable(idToken, m_module);
+        result.setType(t);
+        return result;
+    }
 
-     public SmiTextualConvention createTextualConvention(IdToken idToken) {
-         return new SmiTextualConvention(idToken, m_module);
-     }
+    public SmiTextualConvention createTextualConvention(IdToken idToken) {
+        return new SmiTextualConvention(idToken, m_module);
+    }
 
-     public SmiType createSequenceType() {
-         return new SmiType(null, m_module);
-     }
+    public SmiType createSequenceType() {
+        return new SmiType(null, m_module);
+    }
 
-     public SmiType getDefinedType(Token moduleToken, Token typeToken) {
-         ModuleParser mp = this;
-         if (moduleToken != null) {
-             mp = getParserPhase().use(idt(moduleToken));
-         }
-         return mp.useType(idt(typeToken));
-     }
+    public SmiType getDefinedType(Token moduleToken, Token typeToken) {
+        ModuleParser mp = this;
+        if (moduleToken != null) {
+            mp = getParserPhase().use(idt(moduleToken));
+        }
+        return mp.useType(idt(typeToken));
+    }
 
-     public SmiType createType(SmiType baseType) {
-         SmiType result = new SmiType(null, m_module);
-         result.setBaseType(baseType);
-         return result;
-     }
+    public SmiType createType(SmiType baseType) {
+        SmiType result = new SmiType(null, m_module);
+        result.setBaseType(baseType);
+        return result;
+    }
 
-     public SmiAttribute useColumn(Token idToken) {
-         return m_valueMap.use(idt(idToken), SmiAttribute.class);
-     }
+    public SmiAttribute useColumn(Token idToken) {
+        return m_valueMap.use(idt(idToken), SmiAttribute.class);
+    }
 
-     public void addField(SmiType sequenceType, SmiAttribute col, SmiType fieldType) {
-         sequenceType.addField(col, fieldType);
-     }
+    public SmiRow useRow(IdToken idToken) {
+        return m_valueMap.use(idToken, SmiRow.class);    
+    }
 
-     public SmiType createSequenceOfType(Token elementTypeNameToken) {
-         SmiType elementType = m_typeMap.use(idt(elementTypeNameToken));
-         SmiType sequenceOfType = new SmiType(null, m_module);
-         sequenceOfType.setElementType(elementType);
-         return sequenceOfType;
-     }
+    public void addField(SmiType sequenceType, SmiAttribute col, SmiType fieldType) {
+        sequenceType.addField(col, fieldType);
+    }
 
-     public void addRange(List<SmiRange> rc, org.jsmiparser.util.token.Token rv1, org.jsmiparser.util.token.Token rv2) {
-         SmiRange range = null;
-         if (rv2 != null) {
-             range = new SmiRange(rv1, rv2);
-         } else {
-             range = new SmiRange(rv1);
-         }
-         rc.add(range);
-     }
+    public SmiType createSequenceOfType(Token elementTypeNameToken) {
+        SmiType elementType = m_typeMap.use(idt(elementTypeNameToken));
+        SmiType sequenceOfType = new SmiType(null, m_module);
+        sequenceOfType.setElementType(elementType);
+        return sequenceOfType;
+    }
 
-     public BinaryStringToken bst(Token bt) {
-         return new BinaryStringToken(makeLocation(bt), bt.getText());
-     }
+    public void addRange(List<SmiRange> rc, org.jsmiparser.util.token.Token rv1, org.jsmiparser.util.token.Token rv2) {
+        SmiRange range = null;
+        if (rv2 != null) {
+            range = new SmiRange(rv1, rv2);
+        } else {
+            range = new SmiRange(rv1);
+        }
+        rc.add(range);
+    }
 
-     public HexStringToken hst(Token nt) {
-         return new HexStringToken(makeLocation(nt), nt.getText());
-     }
+    public BinaryStringToken bst(Token bt) {
+        return new BinaryStringToken(makeLocation(bt), bt.getText());
+    }
+
+    public HexStringToken hst(Token nt) {
+        return new HexStringToken(makeLocation(nt), nt.getText());
+    }
 
 }
 

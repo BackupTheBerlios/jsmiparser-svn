@@ -303,6 +303,10 @@ options	{
 	public void init(ModuleParser mp) {
 		m_mp = mp;
 	}
+
+	public SmiModule getCurrentModule() {
+		return m_mp.getModule();
+	}
 }
 
 
@@ -695,7 +699,10 @@ defined_value
 	(UPPER DOT)? LOWER
 ;
 
-
+// TODO: it might be possible to split this this up into several
+// definitions, thereby syntactically guaranteeing that INDEX/AUGMENTS
+// belong only to rows, UNITS and DEFVAL only for variables. And
+// REFERENCE?
 objecttype_macro[IdToken idToken] returns [SmiObjectType ot = null]
 {
 	SmiType t = null; // TODO fill in
@@ -709,7 +716,7 @@ objecttype_macro[IdToken idToken] returns [SmiObjectType ot = null]
 	( ("ACCESS" objecttype_access_v1)
 		| ("MAX-ACCESS"  objecttype_access_v2) )? 
 	"STATUS" status_all
-	( "DESCRIPTION" C_STRING )? /* Optional only for SMIv1 */
+	( "DESCRIPTION" C_STRING )? /* TODO optional only for SMIv1 */
 	( "REFERENCE" C_STRING )? 	  
 	( "INDEX" objecttype_macro_index
           | "AUGMENTS" objecttype_macro_augments )?
@@ -772,8 +779,10 @@ objecttype_macro_indextype
 
 objecttype_macro_augments
 :
-	L_BRACE defined_value R_BRACE
+	L_BRACE use_row R_BRACE
 ;
+
+
 
 
 moduleidentity_macro
@@ -984,5 +993,28 @@ lower returns [IdToken result = null]
 {
 	result = m_mp.idt(l);
 }
+;
 
+use_row returns [SmiRow row = null]
+{
+	ModuleParser mp = m_mp;
+	IdToken idt = null;
+}
+:
+	(mp=use_module_parser)? idt=lower
+{
+	row = mp.useRow(idt);
+}
+;
+
+
+use_module_parser returns [ModuleParser mp = null]
+{
+	IdToken mt = null;
+}
+:
+	mt=upper
+{
+	mp = m_mp.getParserPhase().use(mt);
+}
 ;
