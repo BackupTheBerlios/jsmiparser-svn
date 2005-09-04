@@ -38,6 +38,28 @@ public class ModuleParser extends IdSymbolImpl {
 
     private static final Logger m_log = Logger.getLogger(ModuleParser.class);
 
+    public SmiOidMacro createOidMacro(IdToken idToken) {
+        return new SmiOidMacro(idToken, m_module);
+    }
+
+    public SmiAttribute createVariable(IdToken idToken, SmiType t) {
+        SmiAttribute result = new SmiAttribute(idToken, m_module);
+        result.setType(t);
+        return result;
+    }
+
+    public SmiRow createRow(IdToken idToken, SmiType t) {
+        SmiRow result = new SmiRow(idToken, m_module);
+        result.setType(t);
+        return result;
+    }
+
+    public SmiTable createTable(IdToken idToken, SmiType t) {
+        SmiTable result = new SmiTable(idToken, m_module);
+        result.setType(t);
+        return result;
+    }
+
     enum State {
         UNPARSED,
         PARSING,
@@ -111,6 +133,12 @@ public class ModuleParser extends IdSymbolImpl {
         return result;
     }
 
+    /**
+     * Called by other module parsers to imports symbols from this module
+     *
+     * @param idToken
+     * @return
+     */
     public SmiSymbol use(IdToken idToken) {
         if (m_typeMap == null) {
             m_log.debug(idToken + " used from " + m_module.getIdToken());
@@ -245,5 +273,12 @@ public class ModuleParser extends IdSymbolImpl {
     public OidNode registerOid(IdToken idToken, OidNode oc) {
         return getParserPhase().getOidMgr().registerNode(idToken, oc);
     }
+
+    public SmiOidValue createOidValue(IdToken idToken, OidNode oc) {
+        SmiOidValue result = new SmiOidValue(idToken, m_module);
+        result.setOidComponent(oc);
+        return result;
+    }
+
 
 }

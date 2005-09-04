@@ -32,15 +32,16 @@ public class SmiModule extends SmiSymbolContainer {
         super(mib);
         mib_ = mib;
 
-        typeMap_ = new ContextMap<String, SmiType>(mib.typeMap_);
-        symbolMap_ = new ContextMap<String, SmiSymbol>(mib.symbolMap_);
-        classMap_ = new ContextMap<String, SmiClass>(mib.classMap_);
-        attributeMap_ = new ContextMap<String, SmiAttribute>(mib.attributeMap_);
-        scalarMap_ = new ContextMap<String, SmiScalar>(mib.scalarMap_);
-        tableMap_ = new ContextMap<String, SmiTable>(mib.tableMap_);
-        rowMap_ = new ContextMap<String, SmiRow>(mib.rowMap_);
-        columnMap_ = new ContextMap<String, SmiColumn>(mib.columnMap_);
-
+        /*
+        m_typeMap = new ContextMap<String, SmiType>(mib.m_typeMap);
+        m_symbolMap = new ContextMap<String, SmiSymbol>(mib.m_symbolMap);
+        m_classMap = new ContextMap<String, SmiClass>(mib.m_classMap);
+        m_attributeMap = new ContextMap<String, SmiAttribute>(mib.m_attributeMap);
+        m_scalarMap = new ContextMap<String, SmiScalar>(mib.m_scalarMap);
+        m_tableMap = new ContextMap<String, SmiTable>(mib.m_tableMap);
+        m_rowMap = new ContextMap<String, SmiRow>(mib.m_rowMap);
+        m_columnMap = new ContextMap<String, SmiColumn>(mib.m_columnMap);
+        */
         if (idToken != null) {
             setIdToken(idToken);
 
@@ -48,7 +49,7 @@ public class SmiModule extends SmiSymbolContainer {
             IdToken classIdToken = new IdToken(idToken.getLocation(), classId);
             // TODO move to ConceptualModelBuilderPhase
             scalarsClass_ = new SmiScalarsClass(classIdToken, this);
-            classMap_.put(classId, scalarsClass_);
+            m_classMap.put(classId, scalarsClass_);
         }
     }
 
@@ -76,26 +77,26 @@ public class SmiModule extends SmiSymbolContainer {
 
     public SmiType createType(IdToken idToken) {
         SmiType type = new SmiType(idToken, this);
-        typeMap_.put(idToken.getId(), type);
+        m_typeMap.put(idToken.getId(), type);
         return type;
     }
 
     public SmiTextualConvention createTextualConvention(IdToken idToken) {
         SmiTextualConvention tc = new SmiTextualConvention(idToken, this);
-        typeMap_.put(idToken.getId(), tc);
+        m_typeMap.put(idToken.getId(), tc);
         return tc;
     }
 
     public SmiSingleAttributeEnum createSingleAttributeEnum(SmiAttribute attribute) {
         SmiSingleAttributeEnum result = new SmiSingleAttributeEnum(attribute);
-        typeMap_.put(result.getId(), result);
+        m_typeMap.put(result.getId(), result);
         return result;
     }
 
     public SmiScalar createScalar(IdToken idToken) {
         SmiScalar scalar = new SmiScalar(idToken, scalarsClass_);
-        scalarMap_.put(idToken.getId(), scalar);
-        attributeMap_.put(idToken.getId(), scalar);
+        m_scalarMap.put(idToken.getId(), scalar);
+        m_attributeMap.put(idToken.getId(), scalar);
         return scalar;
     }
 
@@ -109,21 +110,21 @@ public class SmiModule extends SmiSymbolContainer {
 
     public SmiTable createTable(IdToken idToken) {
         SmiTable table = new SmiTable(idToken, this);
-        tableMap_.put(idToken.getId(), table);
+        m_tableMap.put(idToken.getId(), table);
         return table;
     }
 
     public SmiRow createRow(IdToken idToken) {
         SmiRow row = new SmiRow(idToken, this);
-        rowMap_.put(idToken.getId(), row);
-        classMap_.put(idToken.getId(), row);
+        m_rowMap.put(idToken.getId(), row);
+        m_classMap.put(idToken.getId(), row);
         return row;
     }
 
     public SmiColumn createColumn(IdToken idToken) {
         SmiColumn col = new SmiColumn(idToken, this);
-        columnMap_.put(idToken.getId(), col);
-        attributeMap_.put(idToken.getId(), col);
+        m_columnMap.put(idToken.getId(), col);
+        m_attributeMap.put(idToken.getId(), col);
         return col;
     }
 
@@ -145,13 +146,13 @@ public class SmiModule extends SmiSymbolContainer {
 
     public SmiMultiRowClass createSmiMultiRowClass(IdToken idToken) {
         SmiMultiRowClass cl = new SmiMultiRowClass(this, idToken);
-        classMap_.put(idToken.getId(), cl); // TODO unique check
+        m_classMap.put(idToken.getId(), cl); // TODO unique check
         return cl;
     }
 
     public SmiScalarsClass createSnmpGroupObject(IdToken idToken) {
         SmiScalarsClass cl = new SmiScalarsClass(idToken, this);
-        classMap_.put(idToken.getId(), cl); // TODO unique check
+        m_classMap.put(idToken.getId(), cl); // TODO unique check
         return cl;
     }
 

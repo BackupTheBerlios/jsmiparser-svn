@@ -19,7 +19,7 @@ import org.jsmiparser.util.token.IdToken;
 
 import java.math.BigInteger;
 
-public abstract class SmiAttribute extends SmiObjectType {
+public class SmiAttribute extends SmiObjectType {
 
     private SmiSingleAttributeEnum singleAttributeEnum_;
 
@@ -28,7 +28,9 @@ public abstract class SmiAttribute extends SmiObjectType {
 		super(idToken, module);
 	}
 
-	public abstract SmiClass getSmiClass();
+	public SmiClass getSmiClass() {
+        return null; // TODO
+    }
 
     public String getCodeConstantId() {
 		return getModule().getMib().getCodeNamingStrategy().getCodeConstantId(this);

@@ -60,7 +60,7 @@ public class SmiMib extends SmiSymbolContainer {
 	}
 	
 	public void determineInheritanceRelations() {
-		for (SmiRow row : rowMap_.values()) {
+		for (SmiRow row : m_rowMap.values()) {
 			if (row.getAugments() != null) {
 				row.addParentRow(row.getAugments());
 			} else if (row.getIndexes().size() == 1) {

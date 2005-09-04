@@ -392,10 +392,11 @@ macroName returns [IdToken result = null]
 ;
 
 
-assignment
+assignment returns [SmiSymbol s = null]
 :
+
 	UPPER ASSIGN_OP type_assignment
-	| l:LOWER value_assignment[m_mp.idt(l)]
+	| l:LOWER s=value_assignment[m_mp.idt(l)]
 ;
 
 type_assignment
@@ -519,35 +520,50 @@ range_value
 
 // VALUES
 
-value_assignment[IdToken idToken]
+value_assignment[IdToken idToken] returns [SmiValue v = null]
 :
-	macro_value_assignment[idToken]
-	| primitive_value_assignment[idToken]
+	v=macro_value_assignment[idToken]
+	| v=primitive_value_assignment[idToken]
 ;
 
-primitive_value_assignment[IdToken idToken]
+primitive_value_assignment[IdToken idToken] returns [SmiOidValue v = null]
+{
+	OidNode oc = null;
+}
 :
-	OBJECT_KW IDENTIFIER_KW ASSIGN_OP oid_value[idToken]
+	OBJECT_KW IDENTIFIER_KW ASSIGN_OP oc=oid_sequence[idToken]
+{
+	v = m_mp.createOidValue(idToken, oc);
+}
 ;
 
-macro_value_assignment[IdToken idToken]
+macro_value_assignment[IdToken idToken] returns [SmiValue v = null]
 :
-	oid_macro_value_assignment[idToken]
+	v=oid_macro_value_assignment[idToken]
 	| int_macro_value_assignment
 ;
 
-oid_macro_value_assignment[IdToken idToken]
+oid_macro_value_assignment[IdToken idToken] returns [SmiOidMacro v = null]
+{
+	OidNode oc = null;
+}
 :
-	(objecttype_macro
-	| moduleidentity_macro 
+	(v=objecttype_macro[idToken]
+	| moduleidentity_macro
 	| objectidentity_macro
 	| notificationtype_macro
 	| objectgroup_macro
 	| notificationgroup_macro
 	| modulecompliance_macro
 	| agentcapabilities_macro)
-	ASSIGN_OP oid_value[idToken]
+	ASSIGN_OP oc=oid_sequence[idToken]
 	// TODO it's probably better to move the oid stuff into the macro def
+{
+	if (v == null) { // TODO temporary
+		v = m_mp.createOidMacro(idToken);
+	}
+	v.setOidComponent(oc);
+}
 ;
 
 int_macro_value_assignment
@@ -557,17 +573,20 @@ int_macro_value_assignment
 
 
 leaf_value
+{
+	OidNode oc = null;
+}
 :
 	integer_value
 	| (bits_value) => bits_value
-	| oid_value[null]
+	| oc=oid_sequence[null]
 	| octet_string_value
 	| defined_value
 	| NULL_KW
 ;
 
 
-oid_value [IdToken idToken] returns [OidNode oc = null]
+oid_sequence [IdToken idToken] returns [OidNode oc = null]
 :
 	L_BRACE
 		(oc=oid_component[oc])+
@@ -607,12 +626,15 @@ defined_value
 ;
 
 
-objecttype_macro
+objecttype_macro[IdToken idToken] returns [SmiObjectType ot = null]
+{
+	SmiType t = null; // TODO fill in
+}
 :
 	"OBJECT-TYPE" "SYNTAX"
-		( leaf_type
-		  | sequence_type
-		  | sequenceof_type ) 
+		( leaf_type { m_mp.createVariable(idToken, t); }
+		  | sequence_type { m_mp.createRow(idToken, t); }
+		  | sequenceof_type { m_mp.createTable(idToken, t); } ) 
 	("UNITS" C_STRING)? 
 	( ("ACCESS" objecttype_access_v1)
 		| ("MAX-ACCESS"  objecttype_access_v2) )? 

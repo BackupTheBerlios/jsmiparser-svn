@@ -18,34 +18,29 @@ package org.jsmiparser.smi;
 
 import org.jsmiparser.util.token.IdToken;
 
-public class SmiObjectType extends SmiOidMacro {
+public class SmiOidMacro extends SmiOidValue {
 
-    protected SmiType type_;
-    private SmiPrimitiveType primitiveType_;
+    // TODO
+    private StatusV1 m_statusV1;
+    private StatusV2 m_statusV2;
 
-    public SmiObjectType(IdToken idToken, SmiModule module) {
+    public SmiOidMacro(IdToken idToken, SmiModule module) {
         super(idToken, module);
     }
 
+    public StatusV1 getStatusV1() {
+        return m_statusV1;
+    }
 
-    public SmiPrimitiveType getPrimitiveType() {
-		if (type_ != null) {
-			return type_.getPrimitiveType();
-		}
-		else {
-			return primitiveType_;
-		}
-	}
+    public void setStatusV1(StatusV1 statusV1) {
+        m_statusV1 = statusV1;
+    }
 
-    public void setPrimitiveType(SmiPrimitiveType primitiveType) {
-		primitiveType_ = primitiveType;
-	}
+    public StatusV2 getStatusV2() {
+        return m_statusV2;
+    }
 
-    public SmiType getType() {
-		return type_;
-	}
-
-    public void setType(SmiType type) {
-		type_ = type;
-	}
+    public void setStatusV2(StatusV2 statusV2) {
+        m_statusV2 = statusV2;
+    }
 }
