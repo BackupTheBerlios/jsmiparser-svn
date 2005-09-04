@@ -196,5 +196,9 @@ public class SmiSymbolMap<Symbol extends SmiSymbol> {
         return m_map.size();
     }
 
-
+    public void check() {
+        for (Symbol symbol : m_map.values()) {
+            if (symbol.)
+        }
+    }
 }
