@@ -16,18 +16,16 @@
 package org.jsmiparser.phase.mib;
 
 import org.apache.log4j.Logger;
-import org.jsmiparser.util.problem.ProblemReporterFactory;
-import org.jsmiparser.util.token.IdToken;
+import org.jsmiparser.parsetree.asn1.*;
+import org.jsmiparser.parsetree.smi.SMINamedBit;
+import org.jsmiparser.parsetree.smi.SMIObjectTypeMacro;
+import org.jsmiparser.parsetree.smi.SMITextualConventionMacro;
+import org.jsmiparser.parsetree.smi.SMIType;
 import org.jsmiparser.phase.AbstractPhase;
 import org.jsmiparser.phase.PhaseException;
 import org.jsmiparser.smi.*;
-import org.jsmiparser.parsetree.asn1.*;
-import org.jsmiparser.parsetree.smi.SMITextualConventionMacro;
-import org.jsmiparser.parsetree.smi.SMINamedBit;
-import org.jsmiparser.parsetree.smi.SMIObjectTypeMacro;
-import org.jsmiparser.parsetree.smi.SMIType;
-
-import java.math.BigInteger;
+import org.jsmiparser.util.problem.ProblemReporterFactory;
+import org.jsmiparser.util.token.IdToken;
 
 // TODO remove?
 public class MibBuilderPhase extends AbstractPhase {
@@ -71,7 +69,7 @@ public class MibBuilderPhase extends AbstractPhase {
                     convertType(at, stc);
                     if (!atc.getSyntaxNamedBits().isEmpty()) {
                         for (SMINamedBit nb : atc.getSyntaxNamedBits()) {
-                            stc.addEnumValue(nb.getName(), BigInteger.valueOf(nb.getNumber()));
+                            // TODO delete stc.addEnumValue(nb.getName(), BigInteger.valueOf(nb.getNumber()));
                         }
                     }
                 }
@@ -88,7 +86,7 @@ public class MibBuilderPhase extends AbstractPhase {
                             SmiType type = sm.createType(SmiUtil.ucFirst(idToken));
                             //System.out.println("Create attr type " + type.getId());
                             for (SMINamedBit nb : otm.getNamedBits()) {
-                                type.addEnumValue(nb.getName(), BigInteger.valueOf(nb.getNumber()));
+                                // TODO delete type.addEnumValue(nb.getName(), BigInteger.valueOf(nb.getNumber()));
                             }
                         }
                     }
@@ -103,7 +101,7 @@ public class MibBuilderPhase extends AbstractPhase {
             if (!nnt.getNamedNumbers().isEmpty()) {
                 for (ASNNamedNumber ann : nnt.getNamedNumbers()) {
                     ASNLiteralValue lv = (ASNLiteralValue) ann.getIntValue();
-                    st.addEnumValue(ann.getName(), lv.getNumberValue());
+                    // TODO delete st.addEnumValue(ann.getName(), lv.getNumberValue());
                 }
             }
         }

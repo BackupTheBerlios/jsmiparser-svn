@@ -17,12 +17,7 @@ package org.jsmiparser.smi;
 
 import org.jsmiparser.util.token.IdToken;
 
-import java.math.BigInteger;
-
 public class SmiAttribute extends SmiObjectType {
-
-    private SmiSingleAttributeEnum singleAttributeEnum_;
-
 
     public SmiAttribute(IdToken idToken, SmiModule module) {
 		super(idToken, module);
@@ -47,21 +42,8 @@ public class SmiAttribute extends SmiObjectType {
 	public String getCodeId() {
 		return getModule().getMib().getCodeNamingStrategy().getAttributeId(this);
 	}
-	
-	public SmiSingleAttributeEnum getSingleAttributeEnum() {
-		return singleAttributeEnum_;
-	}
 
-	public SmiEnumValue addEnumValue(String id, BigInteger value) {
-		if (singleAttributeEnum_ == null) {
-			singleAttributeEnum_ = getModule().createSingleAttributeEnum(this);
-			singleAttributeEnum_.setPrimitiveType(SmiPrimitiveType.ENUM);
-		}
-		type_ = singleAttributeEnum_;
-		return singleAttributeEnum_.addEnumValue(id, value);
-	}
-	
-	public String getRequestMethodId() {
+    public String getRequestMethodId() {
 		return getModule().getMib().getCodeNamingStrategy().getRequestMethodId(this);
 	}
 

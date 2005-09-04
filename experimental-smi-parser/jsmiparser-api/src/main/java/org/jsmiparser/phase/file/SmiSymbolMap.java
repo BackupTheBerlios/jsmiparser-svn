@@ -109,6 +109,25 @@ public class SmiSymbolMap<Symbol extends SmiSymbol> {
         return result;
     }
 
+    public <T extends Symbol> T use(IdToken idToken, Class<T> cl) {
+        T result = null;
+        Symbol symbol = m_map.get(idToken.getId());
+        if (symbol != null) {
+            if (cl.isInstance(symbol)) {
+                result = cl.cast(symbol);
+            } else {
+                m_pr.reportIncompatibleType(idToken.getLocation(), symbol.getClass().getSimpleName(),
+                        idToken.getId(), cl.getSimpleName());
+                result = newInstance(idToken, cl);
+            }
+        } else {
+            result = newInstance(idToken, cl);
+            m_map.put(result.getId(), result);
+        }
+
+        return result;
+    }
+
 
     private Symbol newInstance(IdToken idToken) {
         try {
@@ -120,6 +139,23 @@ public class SmiSymbolMap<Symbol extends SmiSymbol> {
         } catch (IllegalArgumentException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private <T> T newInstance(IdToken idToken, Class<T> cl) {
+        try {
+            Constructor<T> constructor = cl.getConstructor(IdToken.class, SmiModule.class);
+            return constructor.newInstance(idToken, m_module);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }

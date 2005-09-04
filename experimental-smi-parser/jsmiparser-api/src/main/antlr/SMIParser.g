@@ -394,44 +394,56 @@ macroName returns [IdToken result = null]
 
 assignment returns [SmiSymbol s = null]
 :
-
-	UPPER ASSIGN_OP type_assignment
+	u:UPPER ASSIGN_OP s=type_assignment[m_mp.idt(u)]
 	| l:LOWER s=value_assignment[m_mp.idt(l)]
 ;
 
-type_assignment
+type_assignment[IdToken idToken] returns [SmiType t = null]
 :
-	textualconvention_macro
-	| leaf_type
-	| sequence_type
+	t=textualconvention_macro[idToken]
+	| t=leaf_type		{ t.setIdToken(idToken); }
+	| t=sequence_type	{ t.setIdToken(idToken); }
 ;
 
 // valid type for a leaf node (scalar or column)
-leaf_type
+leaf_type returns [SmiType t = null]
 :
-	integer_type
-	| oid_type
-	| octet_string_type
-	| bits_type
-	| defined_type
+	t=integer_type
+	| t=oid_type
+	| t=octet_string_type
+	| t=bits_type
+	| t=defined_type
 ;
 
-integer_type
+integer_type returns [SmiType t = null]
 :
-	integer_type_kw
-	(named_number_list | range_constraint)?
+	t=integer_type_kw
+	(t=named_number_list[t] | t=range_constrained_type[t])?
 ;
 
-integer_type_kw
+range_constrained_type[SmiType baseType] returns [SmiType t = null]
+{
+	List<SmiRange> rc = null;
+}
 :
-	INTEGER_KW
-	| "Integer32"
-	| "Counter"
-	| "Counter32"
-	| "Gauge"
-	| "Gauge32"
-	| "Counter64"
-	| "TimeTicks"
+	rc=range_constraint
+{
+	t = m_mp.createType(t);
+	t.setRangeConstraint(rc);
+}
+;
+
+// TODO should get these SmiType objects from the imports
+integer_type_kw returns [SmiType t = null]
+:
+	INTEGER_KW	{ t = SmiConstants.INTEGER_TYPE; }
+	| "Integer32"	{ t = SmiConstants.INTEGER_32_TYPE; }
+	| "Counter"	{ t = SmiConstants.COUNTER_TYPE; }
+	| "Counter32"	{ t = SmiConstants.COUNTER_32_TYPE; }
+	| "Gauge"	{ t = SmiConstants.GAUGE_TYPE; }
+	| "Gauge32"	{ t = SmiConstants.GAUGE_32_TYPE; }
+	| "Counter64"	{ t = SmiConstants.COUNTER_64_TYPE; }
+	| "TimeTicks"	{ t = SmiConstants.TIME_TICKS_TYPE; }
 ;
 
 integer_type_id returns [IdToken result = null]
@@ -450,71 +462,129 @@ integer_type_id returns [IdToken result = null]
 }
 ;
 
-oid_type
+oid_type returns [SmiType t = null]
 :
 	OBJECT_KW IDENTIFIER_KW
+{
+	t = SmiConstants.OBJECT_IDENTIFIER_TYPE;
+}
 ;
 
-octet_string_type
+octet_string_type returns [SmiType t = null]
 :
-	OCTET_KW STRING_KW (size_constraint)?
+	OCTET_KW STRING_KW { t = SmiConstants.OCTET_STRING_TYPE; }
+	(t=size_constrained_type[t])?
 ;
 
-bits_type
+size_constrained_type[SmiType baseType] returns [SmiType t = null]
+{
+	List<SmiRange> sc = null;
+}
 :
-	"BITS" (named_number_list)?
+	sc=size_constraint
+{
+	t = m_mp.createType(baseType);
+	t.setSizeConstraint(sc);
+}
+;
+	
+
+
+bits_type returns [SmiType t = null]
+:
+	"BITS" 			{ t= SmiConstants.BITS_TYPE; }
+	(t=named_number_list[t])?
 ;
 
-defined_type
+defined_type returns [SmiType t = null]
 :
-	(UPPER DOT)? UPPER 
-	(named_number_list | constraint)?
+	(mt:UPPER DOT)? tt:UPPER 	{ t = m_mp.getDefinedType(mt, tt); }
+	(t=named_number_list[t] | t=constrained_type[t])?
 ;
 
-sequence_type
+constrained_type[SmiType baseType] returns [SmiType t = null]
 :
-	SEQUENCE_KW
+	t = size_constrained_type[baseType]
+	| t = range_constrained_type[baseType]
+;
+
+
+sequence_type returns [SmiType t = null]
+:
+	SEQUENCE_KW	{ t = m_mp.createSequenceType(); }
 	L_BRACE
-		LOWER leaf_type
-		(COMMA LOWER leaf_type)*
+		sequence_field[t]
+		(COMMA sequence_field[t])*
 	R_BRACE
 ;
 
-sequenceof_type
+sequence_field[SmiType sequenceType]
+{
+	SmiAttribute col = null;
+	SmiType fieldType = null;
+}
 :
-	SEQUENCE_KW OF_KW UPPER
+	l: LOWER	{ col = m_mp.useColumn(l); }
+	fieldType=leaf_type
+{
+	m_mp.addField(sequenceType, col, fieldType);
+}
+;
+
+sequenceof_type returns [SmiType t = null]
+:
+	SEQUENCE_KW OF_KW u:UPPER
+{
+	t = m_mp.createSequenceOfType(u);
+}
 ;
 
 
 /* SMI v2: Sub-typing - defined in RFC 1902 section 7.1 and appendix C and RFC 1904 */
-constraint
+/* not needed anymore
+constraint[SmiType baseType] returns [SmiType t = null]
 :
-	range_constraint
-	| size_constraint
+	t=range_constraint[baseType]
+	| t=size_constraint[baseType]
 ;
+*/
+
 
 // for integers
-range_constraint
+range_constraint returns [List<SmiRange> rc = null]
 :
-	L_PAREN range (BAR range)* R_PAREN
+	L_PAREN		{ rc = new ArrayList<SmiRange>(); }
+		range[rc]
+		(BAR range[rc])*
+	R_PAREN
 ;
 
 // for strings
-size_constraint
+size_constraint returns [List<SmiRange> rc = null]
 :
-	L_PAREN "SIZE" range_constraint R_PAREN
+	L_PAREN "SIZE"
+		rc=range_constraint
+	R_PAREN
 ;
 
-range
+range[List<SmiRange> rc]
+{
+	org.jsmiparser.util.token.Token rv1 = null;
+	org.jsmiparser.util.token.Token rv2 = null;
+}
 :
-	range_value (DOTDOT range_value)?
+	rv1=range_value
+	(DOTDOT rv2=range_value)?
+{
+	m_mp.addRange(rc, rv1, rv2);
+}
 ;
 
-range_value
+range_value returns [org.jsmiparser.util.token.Token t = null]
 :
-	(MINUS)? NUMBER
-	| B_STRING
-	| H_STRING
+	(mt:MINUS)? nt:NUMBER	{ t = m_mp.bintt(mt, nt); }
+	| bt:B_STRING		{ t = m_mp.bst(bt); }
+	| ht:H_STRING		{ t = m_mp.hst(ht); }
 ;
 
 
@@ -739,9 +809,9 @@ notificationtype_macro
 	"DESCRIPTION" C_STRING ("REFERENCE" C_STRING)?
 ;
 
-textualconvention_macro
+textualconvention_macro[IdToken idToken] returns [SmiTextualConvention tc=null]
 :
-	"TEXTUAL-CONVENTION"
+	"TEXTUAL-CONVENTION"	{ tc = m_mp.createTextualConvention(idToken); }
 	("DISPLAY-HINT" C_STRING)?
 	"STATUS" status_v2 
 	"DESCRIPTION" C_STRING 
@@ -875,19 +945,29 @@ traptype_macro
 	("REFERENCE" C_STRING)?
 ;
 
-named_number_list
+named_number_list[SmiType baseType] returns [SmiType t = null]
 :
-	L_BRACE named_number (COMMA named_number)* R_BRACE
+	L_BRACE		{ t = m_mp.createType(baseType); }
+		named_number[t]
+		(COMMA named_number[t])*
+	R_BRACE
 ;
 
-named_number
+named_number[SmiType t]
+{
+	IdToken it = null;
+	BigIntegerToken bit = null;
+}
 :
-	LOWER L_PAREN signed_number R_PAREN
+	it=lower L_PAREN bit=signed_number R_PAREN
+{
+	t.addEnumValue(it, bit);
+}
 ;
 
-signed_number
+signed_number returns [BigIntegerToken bit = null]
 :
-	(MINUS)? NUMBER
+	(mt:MINUS)? nt:NUMBER { bit = m_mp.bintt(mt, nt); }
 ;
 
 upper returns [IdToken result = null]
@@ -904,4 +984,5 @@ lower returns [IdToken result = null]
 {
 	result = m_mp.idt(l);
 }
+
 ;

@@ -19,6 +19,7 @@ import org.jsmiparser.parsetree.asn1.ASNModule;
 import org.jsmiparser.smi.SmiSymbol;
 import org.jsmiparser.util.problem.annotations.ProblemMethod;
 import org.jsmiparser.util.token.IdToken;
+import org.jsmiparser.util.location.Location;
 
 public interface FileParserProblemReporter {
 
@@ -30,4 +31,7 @@ public interface FileParserProblemReporter {
 
     @ProblemMethod(message = "Duplicate assignment %s originally defined at %s")
     void reportDuplicateAssignment(SmiSymbol duplicate, SmiSymbol original);
+
+    @ProblemMethod(message = "Found %s %s but expected a % instance.")
+    void reportIncompatibleType(Location l, String foundClassName, String id, String expectedClassName);
 }

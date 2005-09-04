@@ -27,9 +27,7 @@ import org.jsmiparser.phase.oid.OidNode;
 import org.jsmiparser.smi.*;
 import org.jsmiparser.util.location.Location;
 import org.jsmiparser.util.symbol.IdSymbolImpl;
-import org.jsmiparser.util.token.BigIntegerToken;
-import org.jsmiparser.util.token.IdToken;
-import org.jsmiparser.util.token.IntegerToken;
+import org.jsmiparser.util.token.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +56,61 @@ public class ModuleParser extends IdSymbolImpl {
         SmiTable result = new SmiTable(idToken, m_module);
         result.setType(t);
         return result;
+    }
+
+    public SmiTextualConvention createTextualConvention(IdToken idToken) {
+        return new SmiTextualConvention(idToken, m_module);
+    }
+
+    public SmiType createSequenceType() {
+        return new SmiType(null, m_module);
+    }
+
+    public SmiType getDefinedType(Token moduleToken, Token typeToken) {
+        ModuleParser mp = this;
+        if (moduleToken != null) {
+            mp = getParserPhase().use(idt(moduleToken));
+        }
+        return mp.useType(idt(typeToken));
+    }
+
+    public SmiType createType(SmiType baseType) {
+        SmiType result = new SmiType(null, m_module);
+        result.setBaseType(baseType);
+        return result;
+    }
+
+    public SmiAttribute useColumn(Token idToken) {
+        return m_valueMap.use(idt(idToken), SmiAttribute.class);
+    }
+
+    public void addField(SmiType sequenceType, SmiAttribute col, SmiType fieldType) {
+        sequenceType.addField(col, fieldType);
+    }
+
+    public SmiType createSequenceOfType(Token elementTypeNameToken) {
+        SmiType elementType = m_typeMap.use(idt(elementTypeNameToken));
+        SmiType sequenceOfType = new SmiType(null, m_module);
+        sequenceOfType.setElementType(elementType);
+        return sequenceOfType;
+    }
+
+    public void addRange(List<SmiRange> rc, org.jsmiparser.util.token.Token rv1, org.jsmiparser.util.token.Token rv2) {
+        SmiRange range = null;
+        if (rv2 != null) {
+            range = new SmiRange(rv1, rv2);
+        } else {
+            range = new SmiRange(rv1);
+        }
+        rc.add(range);
+    }
+
+    public BinaryStringToken bst(Token bt) {
+        return new BinaryStringToken(makeLocation(bt), bt.getText());
+    }
+
+    public HexStringToken hst(Token nt) {
+        return new HexStringToken(makeLocation(nt), nt.getText());
     }
 
     enum State {
@@ -158,6 +211,10 @@ public class ModuleParser extends IdSymbolImpl {
         return result;
     }
 
+    public SmiType useType(IdToken idToken) {
+        return m_typeMap.use(idToken);
+    }
+
     public SmiModule useModule(IdToken idToken) {
         if (m_module == null) {
             init(new SmiModule(m_parserPhase.getMib(), idToken));
@@ -230,6 +287,10 @@ public class ModuleParser extends IdSymbolImpl {
         return new BigIntegerToken(makeLocation(t), false, t.getText());
     }
 
+    public BigIntegerToken bintt(Token minusToken, Token t) {
+        return new BigIntegerToken(makeLocation(t), minusToken != null, t.getText());
+    }
+
     public List<IdToken> makeIdTokenList() {
         return new ArrayList<IdToken>();
     }
@@ -279,6 +340,18 @@ public class ModuleParser extends IdSymbolImpl {
         result.setOidComponent(oc);
         return result;
     }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }
