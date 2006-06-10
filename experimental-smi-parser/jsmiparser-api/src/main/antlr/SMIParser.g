@@ -235,18 +235,19 @@ SL_COMMENT
 
 NUMBER	:	('0'..'9')+ ;
 
+// TODO in principle, underscores are not allowed in UPPER/LOWER identifiers
 UPPER	
 options {testLiterals = false;}
 	:   ('A'..'Z') 
 		(options {warnWhenFollowAmbig = false;}
-	:	( 'a'..'z' | 'A'..'Z' |'-' | '0'..'9' ))*
+	:	( 'a'..'z' | 'A'..'Z' | '-' | '_' | '0'..'9' ))*
 ;
 
 LOWER
 options {testLiterals = false;}
 	:	('a'..'z') 
 		(options {warnWhenFollowAmbig = false;}
-	:	( 'a'..'z' | 'A'..'Z' |'-' | '0'..'9' ))*
+	:	( 'a'..'z' | 'A'..'Z' | '-' | '_' | '0'..'9' ))*
 ;
 
 

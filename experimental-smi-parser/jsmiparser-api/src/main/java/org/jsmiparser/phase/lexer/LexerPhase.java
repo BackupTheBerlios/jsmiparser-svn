@@ -64,10 +64,10 @@ public class LexerPhase implements Phase {
             lex(lexer, file.getPath(), m_lexerMib.getModules());
         } catch (TokenStreamException e) {
             m_log.error(e.getClass().getSimpleName(), e);
-            throw new PhaseException(e);
+            throw new PhaseException(file.getPath(), e);
         } catch (FileNotFoundException e) {
             m_log.error(e.getClass().getSimpleName(), e);
-            throw new PhaseException(e);
+            throw new PhaseException(file.getPath(), e);
         } finally {
             if (is != null) {
                 try {
