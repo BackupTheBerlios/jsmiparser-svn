@@ -5,6 +5,7 @@
   <artifactId>jsmiparser-root</artifactId>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
+  <name>Java SMI Parser Root Project</name>
   <inceptionYear>2005</inceptionYear>
   <modules>
     <module>jsmiparser-util</module>
@@ -30,6 +31,7 @@
 	  <target>1.5</target>
 	</configuration>
       </plugin>
+      <!--
       <plugin>
 	<groupId>org.apache.maven.plugins</groupId>
 	<artifactId>maven-idea-plugin</artifactId>
@@ -37,6 +39,7 @@
 	  <jdkName>java version 1.5.0_04</jdkName>
 	</configuration>
       </plugin>
+      -->
     </plugins>
   </build>
 
