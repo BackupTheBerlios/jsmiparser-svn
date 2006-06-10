@@ -1,46 +1,34 @@
-<?xml version="1.0"?>
-<project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.jsmiparser</groupId>
-  <artifactId>jsmiparser-root</artifactId>
-  <packaging>pom</packaging>
-  <version>1.0-SNAPSHOT</version>
-  <name>Java SMI Parser Root Project</name>
-  <inceptionYear>2005</inceptionYear>
-  <modules>
-    <module>jsmiparser-util</module>
-    <module>jsmiparser-api</module>
-  </modules>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.jsmiparser</groupId>
+    <artifactId>jsmiparser</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>Java SMI Parser</name>
 
-  <!--
-  <pluginRepositories>
-    <pluginRepository>http://www.neonics.com/maven2</pluginRepository>
-  </pluginRepositories>
-  -->
+    <modules>
+        <module>jsmiparser-util</module>
+        <module>jsmiparser-api</module>
+    </modules>
 
+    <scm>
+        <connection>scm:svn://svn.berlios.de/svnroot/repos/jsmiparser/experimental-smi-parser</connection>
+        <developerConnection>scm:svn+ssh://svn.berlios.de/svnroot/repos/jsmiparser/experimental-smi-parser</developerConnection>
+    </scm>
 
-  <build>
-    <defaultGoal>install</defaultGoal>
-
-    <plugins>
-      <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-compiler-plugin</artifactId>
-	<configuration>
-	  <source>1.5</source>
-	  <target>1.5</target>
-	</configuration>
-      </plugin>
-      <!--
-      <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-idea-plugin</artifactId>
-	<configuration>
-	  <jdkName>java version 1.5.0_04</jdkName>
-	</configuration>
-      </plugin>
-      -->
-    </plugins>
-  </build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

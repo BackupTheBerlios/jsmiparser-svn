@@ -1,115 +1,60 @@
-<?xml version="1.0"?>
-<project>
-  <parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <groupId>org.jsmiparser</groupId>
-    <artifactId>jsmiparser-root</artifactId>
+    <artifactId>jsmiparser-api</artifactId>
+    <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
-  </parent>
+    <name>Java SMI Parser API</name>
 
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.jsmiparser</groupId>
-  <artifactId>jsmiparser-api</artifactId>
-  <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
-  <name>Java SMI Parser API</name>
+    <parent>
+        <groupId>org.jsmiparser</groupId>
+        <artifactId>jsmiparser</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
 
-  <dependencies>
+    <dependencies>
 
-    <dependency>
-      <groupId>org.jsmiparser</groupId>
-      <artifactId>jsmiparser-util</artifactId>
-      <version>1.O-SNAPSHOT</version>
-    </dependency>
+        <dependency>
+            <groupId>org.jsmiparser</groupId>
+            <artifactId>jsmiparser-util</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
-    <dependency>
-      <groupId>antlr</groupId>
-      <artifactId>antlr</artifactId>
-      <version>2.7.6</version>
-    </dependency>
+        <dependency>
+            <groupId>antlr</groupId>
+            <artifactId>antlr</artifactId>
+            <version>2.7.6</version>
+        </dependency>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.8</version>
-    </dependency>
+    </dependencies>
 
-
-  </dependencies>
-
-  <build>
-
-    <plugins>
-      <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-antlr-plugin</artifactId>
-	<version>2.0-beta-1</version>
-	<executions>
-	  <execution>
-	    <phase>generate-sources</phase>
-	    <goals>
-	      <goal>generate</goal>
-	    </goals>
-	    <configuration>
-	      <grammars>SMIParser.g</grammars>
-	    </configuration>
-	  </execution>
-	</executions>
-      </plugin>
-
-      <!--
-      <plugin>
-	<artifactId>maven-antrun-plugin</artifactId>
-	<version>1.0-alpha-1-SNAPSHOT</version>
-	<executions>
-	  <execution>
-	    <!- - <phase>generate-sources</phase> - ->
-	    <phase>compile</phase>
-	    <goals>
-	      <goal>run</goal>
-	    </goals>
-	    <configuration>
-	      <tasks>
-		<ant antfile="xdoclet.xml">
-		  <property name="project.build.directory"
-			    value="${project.build.directory}"/>
-		  <property name="project.build.outputDirectory"
-			    value="${project.build.outputDirectory}"/>
-		  <property name="settings.localRepository"
-			    value="${settings.localRepository}"/>
-		</ant>
-	      </tasks>
-	    </configuration>
-	  </execution>
-	</executions>
-      </plugin>
-      -->
-      
-      <!--
-      <plugin>
-	<artifactId>maven-idea-plugin</artifactId>
-	<version>2.0-beta-1-SNAPSHOT</version>
-	<executions>
-	  <execution>
-	    <goals>
-	      <goal>myidea</goal>
-	    </goals>
-	    <configuration>
-	      <jdkName>1.5.0_04</jdkName>
-	    </configuration>
-	  </execution>
-	</executions>
-      </plugin>
-      -->
-
-    </plugins>
-
-  </build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antlr-plugin</artifactId>
+                <version>2.0-beta-1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <grammars>SMIParser.g</grammars>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
