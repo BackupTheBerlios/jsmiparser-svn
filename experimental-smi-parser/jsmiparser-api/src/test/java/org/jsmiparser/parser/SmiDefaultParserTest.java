@@ -19,34 +19,35 @@ import junit.framework.TestCase;
 import org.jsmiparser.phase.PhaseException;
 import org.jsmiparser.phase.file.FileParserOptions;
 import org.jsmiparser.smi.SmiMib;
+import org.jsmiparser.smi.SmiModule;
+import org.jsmiparser.smi.SmiOidValue;
+import org.jsmiparser.smi.SmiSymbol;
 import org.jsmiparser.util.problem.DefaultProblemEventHandler;
 import org.jsmiparser.util.problem.ProblemEventHandler;
 
 import java.io.File;
+import java.net.URL;
+import java.net.URISyntaxException;
 
 public class SmiDefaultParserTest extends TestCase {
 
-    public void test() {
-
-        String mibsVar = System.getenv("MIBS");
-        assertNotNull(mibsVar);
-        String[] mibsDirs = mibsVar.split(":");
-        for (String mibDirs : mibsDirs) {
-            doTestParser(mibDirs);
-        }
-
-    }
-
-    private void doTestParser(String mibDirs) throws PhaseException {
+    public void testLibSmi() throws URISyntaxException {
+        URL mibsURL = getClass().getClassLoader().getResource("libsmi-0.4.5/mibs");
+        File mibsDir = new File(mibsURL.toURI());
 
         ProblemEventHandler problemEventHandler = new DefaultProblemEventHandler();
         SmiDefaultParser parser = new SmiDefaultParser(problemEventHandler);
         parser.init();
         FileParserOptions options = (FileParserOptions) parser.getLexerPhase().getOptions();
-        initFileParserOptions(mibDirs, options);
+        initFileParserOptions(options, mibsDir, "iana", "ietf", "site", "tubs");
 
         SmiMib mib = parser.parse();
         assertNotNull(mib);
+        //showOverview(mib);
+
+        //XStream xStream = new XStream();
+        //xStream.toXML(mib, System.out);
+
         // TODO assertEquals(216, mib.getModules().size());
 
         // TODO assertEquals(1522, mib.getTypes().size());
@@ -75,14 +76,22 @@ public class SmiDefaultParserTest extends TestCase {
 
     }
 
-    private void initFileParserOptions(String mibDirsStr, FileParserOptions options) {
-        String[] mibDirs = mibDirsStr.split(",");
-        parseDirs(mibDirs, options);
+    private void showOverview(SmiMib mib) {
+        for (SmiModule module : mib.getModules()) {
+            for (SmiSymbol symbol : module.getSymbols()) {
+                String msg = module.getId() + ": " + symbol.getId() + ": " + symbol.getClass().getSimpleName();
+                if (symbol instanceof SmiOidValue) {
+                    SmiOidValue oidValue = (SmiOidValue) symbol;
+                    msg += ": " + oidValue.getOid();
+                }
+                System.out.println(msg);
+            }
+        }
     }
 
-    private void parseDirs(String[] mibDirs, FileParserOptions options) {
-        for (String d : mibDirs) {
-            File dir = new File(d);
+    private void initFileParserOptions(FileParserOptions options, File mibsDir, String... subDirNames) {
+        for (String subDirName : subDirNames) {
+            File dir = new File(mibsDir, subDirName);
             assertTrue(dir.toString(), dir.exists());
             assertTrue(dir.toString(), dir.isDirectory());
 
@@ -91,7 +100,9 @@ public class SmiDefaultParserTest extends TestCase {
             for (int i = 0; i < files.length; i++) {
                 File file = files[i];
 
+
                 if (file.isFile()
+                        && !file.getName().equals("RFC1158-MIB") // obsoleted by RFC-1213
                         && !file.getName().contains("TOTAL")
                         && !file.getName().endsWith("tree")
                         && !file.getName().startsWith("Makefile")

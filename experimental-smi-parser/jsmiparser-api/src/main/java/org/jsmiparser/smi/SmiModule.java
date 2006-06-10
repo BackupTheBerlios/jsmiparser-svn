@@ -18,6 +18,7 @@ package org.jsmiparser.smi;
 import org.jsmiparser.util.token.IdToken;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class SmiModule extends SmiSymbolContainer {
@@ -27,6 +28,7 @@ public class SmiModule extends SmiSymbolContainer {
 
     private SmiScalarsClass scalarsClass_;
     private List<SmiImports> m_imports = new ArrayList<SmiImports>();
+    private List<SmiSymbol> m_symbols = new ArrayList<SmiSymbol>();
 
     public SmiModule(SmiMib mib, IdToken idToken) {
         super(mib);
@@ -65,6 +67,16 @@ public class SmiModule extends SmiSymbolContainer {
 
     public String getId() {
         return m_idToken.getId();
+    }
+
+    @Override
+    public Collection<SmiSymbol> getSymbols() {
+        // TODO when the symbols have been resolved, set the m_symbols list to null?
+        if (m_symbols != null) {
+            return m_symbols;
+        } else {
+            return super.getSymbols();
+        }
     }
 
     public SmiMib getMib() {

@@ -267,18 +267,28 @@ public class ModuleParser extends IdSymbolImpl {
     }
 
     public SmiAttribute createVariable(IdToken idToken, SmiType t) {
+        final String methodWithParams = "createVariable(" + idToken.getId() + ")";
+        m_log.debug(methodWithParams);
+
         SmiAttribute result = new SmiAttribute(idToken, m_module);
+        //result = m_valueMap.create()
         result.setType(t);
         return result;
     }
 
     public SmiRow createRow(IdToken idToken, SmiType t) {
+        final String methodWithParams = "createRow(" + idToken.getId() + ")";
+        m_log.debug(methodWithParams);
+
         SmiRow result = new SmiRow(idToken, m_module);
         result.setType(t);
         return result;
     }
 
     public SmiTable createTable(IdToken idToken, SmiType t) {
+        final String methodWithParams = "createTable(" + idToken.getId() + ")";
+        m_log.debug(methodWithParams);
+
         SmiTable result = new SmiTable(idToken, m_module);
         result.setType(t);
         return result;

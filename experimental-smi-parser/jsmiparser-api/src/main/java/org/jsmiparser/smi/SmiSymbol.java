@@ -15,11 +15,11 @@
  */
 package org.jsmiparser.smi;
 
-import org.jsmiparser.util.token.IdToken;
 import org.jsmiparser.util.location.Location;
+import org.jsmiparser.util.token.IdToken;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class SmiSymbol {
 
@@ -32,6 +32,11 @@ public class SmiSymbol {
         super();
         m_idToken = idToken;
         m_module = module;
+        if (m_module != null) {
+            if (!(this instanceof SmiType && m_idToken == null)) {
+                m_module.getSymbols().add(this);
+            }
+        }
     }
 
 
@@ -64,8 +69,7 @@ public class SmiSymbol {
         return m_idToken != null ? m_idToken.getLocation() : null;
     }
 
-    public String getUcId()
-    {
+    public String getUcId() {
         return SmiUtil.ucFirst(getId());
     }
 

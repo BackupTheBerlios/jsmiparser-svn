@@ -709,9 +709,9 @@ objecttype_macro[IdToken idToken] returns [SmiObjectType ot = null]
 }
 :
 	"OBJECT-TYPE" "SYNTAX"
-		( leaf_type { m_mp.createVariable(idToken, t); }
-		  | sequence_type { m_mp.createRow(idToken, t); }
-		  | sequenceof_type { m_mp.createTable(idToken, t); } ) 
+		( leaf_type { ot=m_mp.createVariable(idToken, t); }
+		  | sequence_type { ot=m_mp.createRow(idToken, t); }
+		  | sequenceof_type { ot=m_mp.createTable(idToken, t); } ) 
 	("UNITS" C_STRING)? 
 	( ("ACCESS" objecttype_access_v1)
 		| ("MAX-ACCESS"  objecttype_access_v2) )? 

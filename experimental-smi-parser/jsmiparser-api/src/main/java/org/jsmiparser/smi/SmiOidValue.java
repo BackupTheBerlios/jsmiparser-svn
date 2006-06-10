@@ -38,6 +38,11 @@ public class SmiOidValue extends SmiValue {
     }
 
     public String getOid() {
+        if (m_oidComponent == null) {
+            return null;
+            // TODO throw new IllegalStateException("oidComponent not set on " + getIdToken());
+        }
+
         return m_oidComponent.getDecimalDottedStr();
     }
 
