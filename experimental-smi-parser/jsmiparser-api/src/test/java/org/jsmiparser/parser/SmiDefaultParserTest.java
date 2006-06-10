@@ -100,7 +100,6 @@ public class SmiDefaultParserTest extends TestCase {
             for (int i = 0; i < files.length; i++) {
                 File file = files[i];
 
-
                 if (file.isFile()
                         && !file.getName().equals("RFC1158-MIB") // obsoleted by RFC-1213
                         && !file.getName().contains("TOTAL")

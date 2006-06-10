@@ -399,8 +399,13 @@ macroName returns [IdToken result = null]
 
 assignment returns [SmiSymbol s = null]
 :
+    (
 	u:UPPER ASSIGN_OP s=type_assignment[m_mp.idt(u)]
 	| l:LOWER s=value_assignment[m_mp.idt(l)]
+	)
+	{
+	    m_mp.addSymbol(s);
+	}
 ;
 
 type_assignment[IdToken idToken] returns [SmiType t = null]
@@ -707,13 +712,16 @@ defined_value
 objecttype_macro[IdToken idToken] returns [SmiObjectType ot = null]
 {
 	SmiType t = null; // TODO fill in
+	SmiAttribute attr = null;
+	SmiRow row = null;
+	SmiTable table = null;
 }
 :
 	"OBJECT-TYPE" "SYNTAX"
-		( leaf_type { ot=m_mp.createVariable(idToken, t); }
-		  | sequence_type { ot=m_mp.createRow(idToken, t); }
-		  | sequenceof_type { ot=m_mp.createTable(idToken, t); } ) 
-	("UNITS" C_STRING)? 
+		( leaf_type { ot = attr = m_mp.createVariable(idToken, t); }
+		  | sequence_type { ot = row = m_mp.createRow(idToken, t); } // TODO doesn't work, but we can distinguish on the INDEX/AUGMENTS clause
+		  | sequenceof_type { ot = table = m_mp.createTable(idToken, t); } )
+	("UNITS" C_STRING)? // TODO only on SmiAttribute
 	( ("ACCESS" objecttype_access_v1)
 		| ("MAX-ACCESS"  objecttype_access_v2) )? 
 	"STATUS" status_all

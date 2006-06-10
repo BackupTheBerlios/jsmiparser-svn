@@ -32,11 +32,6 @@ public class SmiSymbol {
         super();
         m_idToken = idToken;
         m_module = module;
-        if (m_module != null) {
-            if (!(this instanceof SmiType && m_idToken == null)) {
-                m_module.getSymbols().add(this);
-            }
-        }
     }
 
 

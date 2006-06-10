@@ -24,10 +24,26 @@ import org.jsmiparser.phase.PhaseException;
 import org.jsmiparser.phase.file.antlr.SMIParser;
 import org.jsmiparser.phase.lexer.LexerModule;
 import org.jsmiparser.phase.oid.OidNode;
-import org.jsmiparser.smi.*;
+import org.jsmiparser.smi.SmiAttribute;
+import org.jsmiparser.smi.SmiImports;
+import org.jsmiparser.smi.SmiMacro;
+import org.jsmiparser.smi.SmiModule;
+import org.jsmiparser.smi.SmiOidMacro;
+import org.jsmiparser.smi.SmiOidValue;
+import org.jsmiparser.smi.SmiRange;
+import org.jsmiparser.smi.SmiRow;
+import org.jsmiparser.smi.SmiSymbol;
+import org.jsmiparser.smi.SmiTable;
+import org.jsmiparser.smi.SmiTextualConvention;
+import org.jsmiparser.smi.SmiType;
+import org.jsmiparser.smi.SmiValue;
 import org.jsmiparser.util.location.Location;
 import org.jsmiparser.util.symbol.IdSymbolImpl;
-import org.jsmiparser.util.token.*;
+import org.jsmiparser.util.token.BigIntegerToken;
+import org.jsmiparser.util.token.BinaryStringToken;
+import org.jsmiparser.util.token.HexStringToken;
+import org.jsmiparser.util.token.IdToken;
+import org.jsmiparser.util.token.IntegerToken;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -321,7 +337,7 @@ public class ModuleParser extends IdSymbolImpl {
     }
 
     public SmiRow useRow(IdToken idToken) {
-        return m_valueMap.use(idToken, SmiRow.class);    
+        return m_valueMap.use(idToken, SmiRow.class);
     }
 
     public void addField(SmiType sequenceType, SmiAttribute col, SmiType fieldType) {
@@ -351,6 +367,12 @@ public class ModuleParser extends IdSymbolImpl {
 
     public HexStringToken hst(Token nt) {
         return new HexStringToken(makeLocation(nt), nt.getText());
+    }
+
+    public void addSymbol(SmiSymbol symbol) {
+        if (symbol != null) {
+            m_module.getSymbols().add(symbol);
+        }
     }
 
 }
