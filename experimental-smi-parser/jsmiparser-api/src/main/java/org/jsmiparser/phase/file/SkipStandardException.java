@@ -22,6 +22,7 @@ import org.jsmiparser.phase.oid.OidMgr;
 import java.util.HashSet;
 import java.util.Set;
 
+// TODO remove this
 public class SkipStandardException extends RuntimeException {
 
     private static final Logger m_log = Logger.getLogger(SkipStandardException.class);
@@ -29,13 +30,13 @@ public class SkipStandardException extends RuntimeException {
     public static final Set<String> m_skippedStandardModules = new HashSet<String>();
 
     static {
-        m_skippedStandardModules.add("RFC1065-SMI");
-        m_skippedStandardModules.add("RFC-1215");
-        m_skippedStandardModules.add("SNMPv2-TC");
-        m_skippedStandardModules.add("SNMPv2-CONF");
-        m_skippedStandardModules.add("SNMPv2-SMI");
-        //m_skippedStandardModules.add("RFC1155-SMI");
-        m_skippedStandardModules.add("RFC-1212");
+//        m_skippedStandardModules.add("RFC1065-SMI");
+//        m_skippedStandardModules.add("RFC-1215");
+//        m_skippedStandardModules.add("SNMPv2-TC");
+//        m_skippedStandardModules.add("SNMPv2-CONF");
+//        m_skippedStandardModules.add("SNMPv2-SMI");
+//        m_skippedStandardModules.add("RFC1155-SMI");
+//        m_skippedStandardModules.add("RFC-1212");
     }
 
     public SkipStandardException() {
