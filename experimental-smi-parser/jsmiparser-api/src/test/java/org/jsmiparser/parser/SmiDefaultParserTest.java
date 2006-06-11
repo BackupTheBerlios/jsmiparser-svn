@@ -16,7 +16,6 @@
 package org.jsmiparser.parser;
 
 import junit.framework.TestCase;
-import org.jsmiparser.phase.PhaseException;
 import org.jsmiparser.phase.file.FileParserOptions;
 import org.jsmiparser.smi.SmiMib;
 import org.jsmiparser.smi.SmiModule;
@@ -26,8 +25,8 @@ import org.jsmiparser.util.problem.DefaultProblemEventHandler;
 import org.jsmiparser.util.problem.ProblemEventHandler;
 
 import java.io.File;
-import java.net.URL;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 public class SmiDefaultParserTest extends TestCase {
 

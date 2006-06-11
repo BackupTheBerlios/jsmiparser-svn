@@ -402,27 +402,35 @@ assignment returns [SmiSymbol s = null]
     (
 	u:UPPER ASSIGN_OP s=type_assignment[m_mp.idt(u)]
 	| l:LOWER s=value_assignment[m_mp.idt(l)]
+	| macroName "MACRO" ASSIGN_OP BEGIN_KW ( ~(END_KW) )* END_KW
+	| s=defined_integer_type_kw ASSIGN_OP leaf_type
 	)
 	{
-	    m_mp.addSymbol(s);
+	    if (s != null) {
+	        m_mp.addSymbol(s);
+	    }
 	}
 ;
 
 type_assignment[IdToken idToken] returns [SmiType t = null]
 :
 	t=textualconvention_macro[idToken]
-	| t=leaf_type		{ t.setIdToken(idToken); }
+	| t=leaf_type		{ if (t != null) { t.setIdToken(idToken); } }
 	| t=sequence_type	{ t.setIdToken(idToken); }
 ;
 
 // valid type for a leaf node (scalar or column)
 leaf_type returns [SmiType t = null]
 :
+    ( L_BRACKET APPLICATION_KW NUMBER R_BRACKET IMPLICIT_KW )? // only used for ApplicationSyntax types
+    (
 	t=integer_type
 	| t=oid_type
 	| t=octet_string_type
 	| t=bits_type
+	| t=choice_type
 	| t=defined_type
+	)
 ;
 
 integer_type returns [SmiType t = null]
@@ -447,7 +455,12 @@ range_constrained_type[SmiType baseType] returns [SmiType t = null]
 integer_type_kw returns [SmiType t = null]
 :
 	INTEGER_KW	{ t = SmiConstants.INTEGER_TYPE; }
-	| "Integer32"	{ t = SmiConstants.INTEGER_32_TYPE; }
+	| t=defined_integer_type_kw
+;
+
+defined_integer_type_kw returns [SmiType t = null]
+:
+	"Integer32"	{ t = SmiConstants.INTEGER_32_TYPE; }
 	| "Counter"	{ t = SmiConstants.COUNTER_TYPE; }
 	| "Counter32"	{ t = SmiConstants.COUNTER_32_TYPE; }
 	| "Gauge"	{ t = SmiConstants.GAUGE_TYPE; }
@@ -497,13 +510,17 @@ size_constrained_type[SmiType baseType] returns [SmiType t = null]
 	t.setSizeConstraint(sc);
 }
 ;
-	
-
 
 bits_type returns [SmiType t = null]
 :
 	"BITS" 			{ t= SmiConstants.BITS_TYPE; }
 	(t=named_number_list[t])?
+;
+
+// only used for ObjectSyntax, SimpleSyntax and ApplicationSyntax
+choice_type returns [SmiType t = null]
+:
+    "CHOICE" L_BRACE ( ~(R_BRACE) )* R_BRACE
 ;
 
 defined_type returns [SmiType t = null]

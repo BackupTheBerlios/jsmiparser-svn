@@ -16,11 +16,14 @@
 package org.jsmiparser.phase.oid;
 
 import org.jsmiparser.util.problem.ProblemReporterFactory;
-import org.jsmiparser.util.token.IdToken;
 import org.jsmiparser.util.token.BigIntegerToken;
+import org.jsmiparser.util.token.IdToken;
 
-import java.util.*;
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -127,7 +130,8 @@ public class OidMgr {
             }
             */
         } else {
-            m_idNodeMap.put(newNode.getId(), newNode);
+            //m_idNodeMap.put(newNode.getId(), newNode);
+            m_idNodeMap.put(idToken.getId(), newNode);
             result = newNode;
         }
 
@@ -139,7 +143,6 @@ public class OidMgr {
             oidNode.check();
         }
     }
-
 
     /*
     public void resolveAll() {
@@ -222,11 +225,22 @@ public class OidMgr {
         }
         */
         if (idToken != null && !idToken.getId().equals(result.getId())) {
-            m_pr.reportIdMismatch(idToken.getLocation(), idToken.getId(), result.getId(), result.getLocation(), "checkStartOidNode");
+            // this happens when two OID's are referred to with several names,
+            // for example atmMIB/mib_2_37 and atmMIBObjects and mib-2_37_1
+            if (!ignoreOidNameMismatch(idToken.getId(), result.getId())) {
+                m_pr.reportIdMismatch(idToken.getLocation(), idToken.getId(), result.getId(), result.getLocation(), "checkStartOidNode");
+            }
         }
         if (valueToken != null && !valueToken.getValue().equals(result.getValue())) {
             m_pr.reportNumberMismatch(valueToken.getLocation(), valueToken.getValue(), result.getValue());
         }
+    }
+
+    // TODO factor out this heuristic stuff into a strategy
+    // other alternative: provide support for replacing certain identifiers at the lexer level
+    private boolean ignoreOidNameMismatch(String id1, String id2) {
+        //return id1.contains("_") || id2.contains("_");
+        return false; // we want to be reminded of this all the time.
     }
 
 
@@ -261,7 +275,6 @@ public class OidMgr {
         } else if (idToken != null) {
             result = findNode(idToken.getId());
             if (result != null) {
-
 
                 // TODO parent stuff
             } else if (parent != null) {

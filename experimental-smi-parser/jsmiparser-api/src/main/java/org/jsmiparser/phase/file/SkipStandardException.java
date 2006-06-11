@@ -16,6 +16,8 @@
 package org.jsmiparser.phase.file;
 
 import org.apache.log4j.Logger;
+import org.jsmiparser.smi.SmiModule;
+import org.jsmiparser.phase.oid.OidMgr;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,7 +34,7 @@ public class SkipStandardException extends RuntimeException {
         m_skippedStandardModules.add("SNMPv2-TC");
         m_skippedStandardModules.add("SNMPv2-CONF");
         m_skippedStandardModules.add("SNMPv2-SMI");
-        m_skippedStandardModules.add("RFC1155-SMI");
+        //m_skippedStandardModules.add("RFC1155-SMI");
         m_skippedStandardModules.add("RFC-1212");
     }
 

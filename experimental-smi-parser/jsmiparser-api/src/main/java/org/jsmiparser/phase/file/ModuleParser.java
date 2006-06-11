@@ -187,16 +187,55 @@ public class ModuleParser extends IdSymbolImpl {
         } catch (SkipStandardException e) {
             init(m_parserPhase.getMib().findModule(e.getMessage()));
             assert(m_module != null);
+            if (m_module.getId().equals("RFC1155-SMI")) {
+                initRFC1155_SMI();
+            }
+
             return m_module;
         } catch (RecognitionException e) {
             m_log.error(e.getClass().getSimpleName(), e);
-            throw new PhaseException(e);
+            throw new PhaseException(getId(), e);
         } catch (TokenStreamException e) {
             m_log.error(e.getClass().getSimpleName(), e);
-            throw new PhaseException(e);
+            throw new PhaseException(getId(), e);
         } finally {
             m_state = State.PARSED;
         }
+    }
+
+    private void initRFC1155_SMI() {
+        // internet      OBJECT IDENTIFIER ::= { iso org(3) dod(6) 1 }
+        OidNode isoNode = resolveHardCodedOidComponent(null, "iso", -1);
+        OidNode orgNode = resolveHardCodedOidComponent(isoNode, "org", 3);
+        OidNode dodNode = resolveHardCodedOidComponent(orgNode, "dod", 6);
+        OidNode internetNode = resolveHardCodedOidComponent(dodNode, null, 1);
+        registerHardCodedOid("internet", internetNode);
+
+        //  directory     OBJECT IDENTIFIER ::= { internet 1 }
+        internetNode = resolveHardCodedOidComponent(null, "internet", -1);
+        OidNode directoryNode = resolveHardCodedOidComponent(internetNode, null, 1);
+        registerHardCodedOid("directory", directoryNode);
+
+        //  mgmt          OBJECT IDENTIFIER ::= { internet 2 }
+        //internetNode = resolveHardCodedOidComponent(null, "internet", -1);
+        OidNode mgmtNode = resolveHardCodedOidComponent(internetNode, null, 2);
+        registerHardCodedOid("mgmt", mgmtNode);
+
+        // experimental  OBJECT IDENTIFIER ::= { internet 3 }
+        //internetNode = resolveHardCodedOidComponent(null, "internet", -1);
+        OidNode experimentalNode = resolveHardCodedOidComponent(internetNode, null, 3);
+        registerHardCodedOid("experimental", experimentalNode);
+
+        // private       OBJECT IDENTIFIER ::= { internet 4 }
+        //internetNode = resolveHardCodedOidComponent(null, "internet", -1);
+        OidNode privateNode = resolveHardCodedOidComponent(internetNode, null, 4);
+        registerHardCodedOid("private", privateNode);
+
+        // enterprises   OBJECT IDENTIFIER ::= { private 1 }
+        privateNode = resolveHardCodedOidComponent(null, "private", -1);
+        OidNode enterprisesNode = resolveHardCodedOidComponent(privateNode, null, 1);
+        registerHardCodedOid("enterprises", enterprisesNode);
+
     }
 
 
@@ -253,12 +292,21 @@ public class ModuleParser extends IdSymbolImpl {
         return createModule(idt(idToken));
     }
 
-    public OidNode resolveOidComponent(OidNode parent, Token it, Token nt) {
-        OidNode result = null;
+    private OidNode resolveHardCodedOidComponent(OidNode parent, String name, int value) {
+        IdToken idToken = new IdToken(null, name);
+        BigIntegerToken valueToken = value >= 0 ? new BigIntegerToken(value) : null;
 
+        return resolveOidComponent(parent, idToken, valueToken);
+    }
+
+    public OidNode resolveOidComponent(OidNode parent, Token it, Token nt) {
         IdToken idToken = (it == null ? null : idt(it));
         BigIntegerToken valueToken = (nt == null ? null : bintt(nt));
+        return resolveOidComponent(parent, idToken, valueToken);
+    }
 
+    private OidNode resolveOidComponent(OidNode parent, IdToken idToken, BigIntegerToken valueToken) {
+        OidNode result;
         if (parent == null) {
             result = getParserPhase().getOidMgr().resolveStart(idToken, valueToken);
         } else {
@@ -271,6 +319,11 @@ public class ModuleParser extends IdSymbolImpl {
     public OidNode registerOid(IdToken idToken, OidNode oc) {
         return getParserPhase().getOidMgr().registerNode(idToken, oc);
     }
+
+    private void registerHardCodedOid(String id, OidNode internetNode) {
+        registerOid(new IdToken(null, id), internetNode);
+    }
+
 
     public SmiOidValue createOidValue(IdToken idToken, OidNode oc) {
         SmiOidValue result = new SmiOidValue(idToken, m_module);
