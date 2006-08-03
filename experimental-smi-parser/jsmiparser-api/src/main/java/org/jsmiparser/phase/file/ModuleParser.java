@@ -286,6 +286,7 @@ public class ModuleParser extends IdSymbolImpl {
             // TODO check duplicate
             result.addSymbol(idToken, symbol);
         }
+        m_module.getImports().add(result);
     }
 
     public SmiModule makeModule(Token idToken) {
