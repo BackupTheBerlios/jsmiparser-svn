@@ -728,25 +728,36 @@ defined_value
 // REFERENCE?
 objecttype_macro[IdToken idToken] returns [SmiObjectType ot = null]
 {
-	SmiType t = null; // TODO fill in
+    SmiType sequenceOfType = null;
+	SmiType type = null; // TODO fill in
 	SmiAttribute attr = null;
 	SmiRow row = null;
 	SmiTable table = null;
+	boolean isRow = false;
 }
 :
 	"OBJECT-TYPE" "SYNTAX"
-		( leaf_type { ot = attr = m_mp.createVariable(idToken, t); }
-		  | sequence_type { ot = row = m_mp.createRow(idToken, t); } // TODO doesn't work, but we can distinguish on the INDEX/AUGMENTS clause
-		  | sequenceof_type { ot = table = m_mp.createTable(idToken, t); } )
+		( type=leaf_type {  }
+		  | sequenceOfType = sequenceof_type )
 	("UNITS" C_STRING)? // TODO only on SmiAttribute
 	( ("ACCESS" objecttype_access_v1)
 		| ("MAX-ACCESS"  objecttype_access_v2) )? 
 	"STATUS" status_all
 	( "DESCRIPTION" C_STRING )? /* TODO optional only for SMIv1 */
 	( "REFERENCE" C_STRING )? 	  
-	( "INDEX" objecttype_macro_index
-          | "AUGMENTS" objecttype_macro_augments )?
+	( ("INDEX" objecttype_macro_index
+          | "AUGMENTS" objecttype_macro_augments) { isRow = true; } )?
 	( "DEFVAL" L_BRACE leaf_value R_BRACE )?
+
+	{
+	    if (sequenceOfType != null) {
+	        ot = table = m_mp.createTable(idToken, type);
+	    } else if (isRow) {
+	        ot = row = m_mp.createRow(idToken, type);
+	    } else {
+	        ot = attr = m_mp.createVariable(idToken, type);
+	    }
+	}
 ;
 
 objecttype_access_v1

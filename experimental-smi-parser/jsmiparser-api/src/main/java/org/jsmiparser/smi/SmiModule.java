@@ -20,6 +20,7 @@ import org.jsmiparser.util.token.IdToken;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class SmiModule extends SmiSymbolContainer {
 
@@ -172,4 +173,26 @@ public class SmiModule extends SmiSymbolContainer {
     public List<SmiImports> getImports() {
         return m_imports;
     }
+
+    public void fillTables() {
+        for (SmiSymbol symbol : m_symbols) {
+//            if (symbol instanceof SmiTable) {
+//                m_tableMap.put(symbol.getId(), (SmiTable) symbol);
+//            }
+            put(m_tableMap, SmiTable.class, symbol);
+            put(m_attributeMap, SmiAttribute.class, symbol);
+            put(m_typeMap, SmiType.class, symbol);
+            put(m_scalarMap, SmiScalar.class, symbol);
+            put(m_columnMap, SmiColumn.class, symbol);
+            put(m_rowMap, SmiRow.class, symbol);
+
+        }
+    }
+
+    private <T extends SmiSymbol> void put(Map<String, T> map, Class<T> clazz, SmiSymbol symbol) {
+        if (clazz.isInstance(symbol)) {
+            map.put(symbol.getId(), (T) symbol);
+        }
+    }
+
 }

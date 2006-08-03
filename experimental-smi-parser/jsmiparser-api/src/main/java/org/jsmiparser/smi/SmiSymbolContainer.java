@@ -82,7 +82,7 @@ public abstract class SmiSymbolContainer {
 	public Collection<SmiScalar> getScalars() {
 		return m_scalarMap.values();
 	}
-	
+
 	public SmiTable findTable(String id) {
 		return m_tableMap.get(id);
 	}
@@ -102,9 +102,9 @@ public abstract class SmiSymbolContainer {
 	public SmiColumn findColumn(String id) {
 		return m_columnMap.get(id);
 	}
-	public Collection<SmiColumn> getColumns()
-	{
-		return m_columnMap.values();
-	}
+
+    public Collection<SmiColumn> getColumns() {
+        return m_columnMap.values();
+    }
 
 }

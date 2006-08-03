@@ -63,7 +63,8 @@ public class MibQualityCheckerPhase extends AbstractPhase {
     public SmiMib process(Object input) throws PhaseException {
         SmiMib mib = (SmiMib) input;
 
-        checkDependencyCycles(mib);
+        // TODO scary: runs out of memory with max heap size 64m
+        //checkDependencyCycles(mib);
 
         return mib;
     }

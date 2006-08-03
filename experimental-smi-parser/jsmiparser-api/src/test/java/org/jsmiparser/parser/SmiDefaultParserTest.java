@@ -21,6 +21,9 @@ import org.jsmiparser.smi.SmiMib;
 import org.jsmiparser.smi.SmiModule;
 import org.jsmiparser.smi.SmiOidValue;
 import org.jsmiparser.smi.SmiSymbol;
+import org.jsmiparser.smi.SmiTable;
+import org.jsmiparser.smi.SmiRow;
+import org.jsmiparser.smi.SmiAttribute;
 import org.jsmiparser.util.problem.DefaultProblemEventHandler;
 import org.jsmiparser.util.problem.ProblemEventHandler;
 
@@ -47,12 +50,26 @@ public class SmiDefaultParserTest extends TestCase {
         //XStream xStream = new XStream();
         //xStream.toXML(mib, System.out);
 
-        // TODO assertEquals(216, mib.getModules().size());
+        assertEquals(254, mib.getModules().size());
+        assertEquals(1815, mib.getTypes().size());
+        assertEquals(1238, mib.getTables().size());
+        assertEquals(1238, mib.getRows().size());
+        assertEquals(12233, mib.getAttributes().size());
+        assertEquals(0, mib.getScalars().size());
+        assertEquals(0, mib.getColumns().size());
 
-        // TODO assertEquals(1522, mib.getTypes().size());
 
-        // TODO: none of the node conversions are implemented yet
-        assertEquals(0, mib.getTables().size());
+        SmiTable ifTable = mib.findTable("ifTable");
+        assertNotNull(ifTable);
+        assertEquals("1.3.6.1.2.1.2.2", ifTable.getOid());
+
+        SmiRow ifEntry = mib.findRow("ifEntry");
+        assertNotNull(ifEntry);
+        assertEquals("1.3.6.1.2.1.2.2.1", ifEntry.getOid());
+
+        SmiAttribute ifAdminStatus = mib.findAttribute("ifAdminStatus");
+        assertNotNull(ifAdminStatus);
+        assertEquals("1.3.6.1.2.1.2.2.1.7", ifAdminStatus.getOid());
 
         /*
         SmiType ifIndexType = mib.findType("InterfaceIndex");
