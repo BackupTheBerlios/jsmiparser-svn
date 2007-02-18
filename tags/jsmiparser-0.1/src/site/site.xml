@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Java SMI Parser">
+<!--
+    <bannerLeft>
+        <name>Java SMI Parser</name>
+        <src>http://maven.apache.org/images/apache-maven-project.png</src>
+        <href>http://maven.apache.org/</href>
+    </bannerLeft>
+    <bannerRight>
+        <src>http://maven.apache.org/images/maven-small.gif</src>
+    </bannerRight>
+-->
+    <body>
+
+
+<!--        <menu name="Java SMI Parser">
+            <item name="Home" href="index.html"/>
+            <item name="SMI V1/V2 Differences" href="smiv1v2diff.html"/>
+        </menu>-->
+
+        <menu ref="modules"/>
+
+        <menu ref="reports"/>
+
+
+    </body>
+</project>
