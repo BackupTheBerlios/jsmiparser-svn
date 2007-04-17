@@ -1,0 +1,218 @@
+JSMI-TYPES-TEST-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        TimeTicks FROM SNMPv2-SMI;
+
+-- Part 1 basic types and constrained versions
+
+MyINTEGER ::= INTEGER
+
+MyINTEGERFromMinus3To4 ::= INTEGER (-3..4)
+
+MyInteger32 ::= Integer32
+
+MyInteger32FromMinus5To6 ::= Integer32 (-5..6)
+
+MyEnum ::= INTEGER {
+    zero(0),
+    one(1),
+    fiftySeven(57)
+}
+
+MyBits ::= BITS {
+    zero(0),
+    one(1),
+    fiftySeven(57)
+}
+
+MyOctetString ::= OCTET STRING
+
+MyDerivedOctetString ::= MyOctetString
+
+MyDerivedOctetStringBetween3And5 ::= MyOctetString (SIZE (3..5))
+
+MyOctetStringBetweenSize9And5 ::= OCTET STRING (SIZE (9..5))
+
+MyCounter ::= Counter
+
+MyCounterFromMinus100To100 ::= Counter (-100..100)
+
+
+-- Part 2: textual convention variants for everything from part 1
+
+TCMyINTEGER ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       deprecated
+    DESCRIPTION  "TCMyINTEGER Desc"
+    SYNTAX       INTEGER
+
+TCMyINTEGERFromMinus3To4 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       deprecated
+    DESCRIPTION  "TCMyINTEGERFromMinus3To4 Desc"
+    SYNTAX       INTEGER (-3..4)
+
+TCMyInteger32 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       deprecated
+    DESCRIPTION  "TCMyInteger32 Desc"
+    SYNTAX       Integer32
+
+TCMyInteger32FromMinus5To6 ::= TEXTUAL-CONVENTION
+         DISPLAY-HINT "255a"
+         STATUS       deprecated
+         DESCRIPTION  "TCMyInteger32FromMinus5To6 Desc"
+         SYNTAX       Integer32 (-5..6)
+
+TCMyEnum ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       deprecated
+    DESCRIPTION  "TCMyEnum Desc"
+    SYNTAX       INTEGER {
+                    zero(0),
+                    one(1),
+                    fiftySeven(57)
+                }
+
+TCMyBits ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       deprecated
+    DESCRIPTION  "TCMyBits Desc"
+    SYNTAX       BITS {
+                    zero(0),
+                    one(1),
+                    fiftySeven(57)
+                }
+
+TCMyOctetString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       deprecated
+    DESCRIPTION  "TCMyOctetString Desc"
+    SYNTAX       OCTET STRING
+
+
+TCMyOctetStringBetweenSize9And5 ::= TEXTUAL-CONVENTION
+         DISPLAY-HINT "255a"
+         STATUS       deprecated
+         DESCRIPTION  "TCMyOctetStringBetweenSize9And5 Desc"
+         SYNTAX       OCTET STRING (SIZE (9..5))
+
+TCMyCounter ::= TEXTUAL-CONVENTION
+         DISPLAY-HINT "255a"
+         STATUS       deprecated
+         DESCRIPTION  "TCMyCounter Desc"
+         SYNTAX       Counter
+
+TCMyCounterFromMinus100To100 ::= TEXTUAL-CONVENTION
+         DISPLAY-HINT "255a"
+         STATUS       deprecated
+         DESCRIPTION  "TCMyCounterFromMinus100To100 Desc"
+         SYNTAX       Counter (-100..100)
+
+-- Part 3 Object types with references to everything from part 1
+
+myINTEGER OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "myINTEGER Desc"
+    ::= { 3456 }
+
+myINTEGERFromMinus3To4 OBJECT-TYPE
+    SYNTAX      INTEGER (-3..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "myINTEGERFromMinus3To4 Desc"
+    ::= { 3456 }
+
+myInteger32 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "myInteger32 Desc"
+    ::= { 3456 }
+
+myInteger32FromMinus5To6 OBJECT-TYPE
+         SYNTAX      Integer32 (-5..6)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "myInteger32FromMinus5To6 Desc"
+         ::= { 3456 }
+
+myEnum OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    zero(0),
+                    one(1),
+                    fiftySeven(57)
+                }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "myEnum Desc"
+    ::= { 3456 }
+
+myBits OBJECT-TYPE
+         SYNTAX     BITS {
+                        zero(0),
+                        one(1),
+                        fiftySeven(57)
+                    }
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "myBits Desc"
+         ::= { 3456 }
+
+
+myOctetString OBJECT-TYPE
+         SYNTAX      OCTET STRING
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "myOctetString Desc"
+         ::= { 3456 }
+
+myOctetStringBetweenSize9And5 OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (9..5))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "myOctetStringBetweenSize9And5 Desc"
+    ::= { 3456 }
+
+myOctetStringOfSize11 OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (11))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "myOctetStringOfSize11 Desc"
+    ::= { 3456 }
+
+myCounter OBJECT-TYPE
+         SYNTAX      Counter
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "myCounter Desc"
+         ::= { 3456 }
+
+
+myCounterFromMinus100To100 OBJECT-TYPE
+         SYNTAX      Counter (-100..100)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "myCounterFromMinus100To100 Desc"
+         ::= { 3456 }
+
+myUnsigned32  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   UNITS       "bps"
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "An unsigned32 type"
+   ::= { 3456 }
+
+myTimeTicks  OBJECT-TYPE
+   SYNTAX      TimeTicks
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "A timeticks type"
+   ::= { 3456 }
+
+-- TODO Part 4 Object types with references to everything from part 2
+
+END
